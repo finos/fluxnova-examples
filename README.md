@@ -1,24 +1,15 @@
-<img align="right" width="40%" src="https://www.finos.org/hubfs/FINOS/finos-logo/FINOS_Icon_Wordmark_Name_RGB_horizontal.png">
+[![FINOS - Incubating](https://cdn.jsdelivr.net/gh/finos/contrib-toolbox@master/images/badge-incubating.svg)](https://community.finos.org/docs/governance/Software-Projects/stages/incubating)
 
-# FINOS Software Project Blueprint
+# Flowave Examples
 
-Project blueprint is a GitHub repository template for all [Fintech Open Source Foundation (FINOS)](https://www.finos.org/) hosted GitHub repositories, contributed and maintained by FINOS.
+## Contributing
 
-## How to use this blueprint
-
-Please follow instructions on [community.finos.org/docs/collaboration-infrastructure#finos-project-blueprint](https://community.finos.org/docs/collaboration-infrastructure#finos-project-blueprint)
-
-## Blueprint preview
-
-A preview of the blueprint can be found on [project-blueprint.finos.org](https://project-blueprint.finos.org)
-
-## Governance
-This blueprint implements https://community.finos.org/docs/governance/#open-source-software-projects
+Please see our [contribution guidelines](CONTRIBUTING.md) for how to raise issues and how to contribute code to our project.
 
 ## License
 
-Copyright 2019 Fintech Open Source Foundation
+Copyright 2025 FINOS
 
-Distributed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+The source files in this repository are made available under the [Apache License Version 2.0](./LICENSE).
 
 SPDX-License-Identifier: [Apache-2.0](https://spdx.org/licenses/Apache-2.0)
