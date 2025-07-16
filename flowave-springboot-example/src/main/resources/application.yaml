@@ -1,0 +1,5 @@
+spring.datasource.url: jdbc:h2:file:./camunda-h2-database
+
+flowave.bpm.admin-user:
+  id: demo
+  password: demo
