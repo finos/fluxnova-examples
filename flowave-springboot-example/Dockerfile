@@ -7,7 +7,7 @@ ENV JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto \
 WORKDIR /flowave
 
 # Install aws-cli, jq, curl
-RUN apk add --no-cache tzdata jq curl gcompat bash
+RUN yum install -y tzdata jq curl bash
 
 # Copies the Spring Boot fat JAR into the working directory
 COPY target/flowave-springboot-example-*.jar flowave.jar
