@@ -6,8 +6,8 @@ ENV JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto \
 
 WORKDIR /flowave
 
-# Install aws-cli, jq, curl
-RUN yum install -y tzdata jq curl bash
+# Install packages
+RUN yum install -y jq curl shadow-utils
 
 # Copies the Spring Boot fat JAR into the working directory
 COPY flowave-springboot-example/target/flowave-springboot-example-*.jar flowave.jar
@@ -15,8 +15,7 @@ COPY flowave-springboot-example/target/flowave-springboot-example-*.jar flowave.
 # Expose port
 EXPOSE 8080
 # Create user and provide access to flowave folder
-RUN addgroup -S flowave_group -g 4001 && \
-    adduser -S flowave_user -G flowave_group -u 4001 -h /flowave
+RUN groupadd -g 4001 flowave_group && adduser -G flowave_group -u 4001 -m -d /flowave flowave_user
 RUN chown -R flowave_user:flowave_group /flowave
 
 USER 4001
