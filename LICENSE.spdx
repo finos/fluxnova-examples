@@ -1,7 +1,7 @@
 SPDXVersion: SPDX-2.0
 DataLicense: CC0-1.0
 Creator: FINOS
-PackageName: flowave-examples
+PackageName: fluxnova-examples
 PackageOriginator: FINOS
-PackageHomePage: https://github.com/finos/flowave-examples
+PackageHomePage: https://github.com/finos/fluxnova-examples
 PackageLicenseDeclared: Apache-2.0

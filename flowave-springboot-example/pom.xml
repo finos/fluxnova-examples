@@ -4,8 +4,8 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.finos.flowave</groupId>
-  <artifactId>flowave-springboot-example</artifactId>
+  <groupId>org.finos.fluxnova</groupId>
+  <artifactId>fluxnova-springboot-example</artifactId>
   <version>0.0.1-SNAPSHOT</version>
 
   <properties>
@@ -25,8 +25,8 @@
       </dependency>
 
       <dependency>
-        <groupId>org.finos.flowave.bpm</groupId>
-        <artifactId>flowave-bom</artifactId>
+        <groupId>org.finos.fluxnova.bpm</groupId>
+        <artifactId>fluxnova-bom</artifactId>
         <version>0.0.1-SNAPSHOT</version>
         <scope>import</scope>
         <type>pom</type>
@@ -36,23 +36,23 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.finos.flowave.bpm.springboot</groupId>
-      <artifactId>flowave-bpm-spring-boot-starter-rest</artifactId>
+      <groupId>org.finos.fluxnova.bpm.springboot</groupId>
+      <artifactId>fluxnova-bpm-spring-boot-starter-rest</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.finos.flowave.bpm.springboot</groupId>
-      <artifactId>flowave-bpm-spring-boot-starter-webapp</artifactId>
+      <groupId>org.finos.fluxnova.bpm.springboot</groupId>
+      <artifactId>fluxnova-bpm-spring-boot-starter-webapp</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.finos.flowave.bpm</groupId>
-      <artifactId>flowave-engine-plugin-spin</artifactId>
+      <groupId>org.finos.fluxnova.bpm</groupId>
+      <artifactId>fluxnova-engine-plugin-spin</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.finos.flowave.spin</groupId>
-      <artifactId>flowave-spin-dataformat-all</artifactId>
+      <groupId>org.finos.fluxnova.spin</groupId>
+      <artifactId>fluxnova-spin-dataformat-all</artifactId>
     </dependency>
 
     <dependency>

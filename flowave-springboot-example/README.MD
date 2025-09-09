@@ -1,7 +1,7 @@
 
-## Example Flowave Spring Boot application
+## Example Fluxnova Spring Boot application
 
-This is a sample Spring Boot application demonstrating the integration of all Flowave dependencies. You can use this project to run a Spring Boot application locally and access the Flowave application.
+This is a sample Spring Boot application demonstrating the integration of all Fluxnova dependencies. You can use this project to run a Spring Boot application locally and access the Fluxnova application.
 
 ## Prerequisites
 
@@ -10,17 +10,17 @@ This is a sample Spring Boot application demonstrating the integration of all Fl
 
 ## Getting Started
 
-1. **Build the `flowave-bpm-platform` project locally. Follow the instructions in the `flowave-build-readme.md` file to build the project.**
+1. **Build the `fluxnova-bpm-platform` project locally. Follow the instructions in the `fluxnova-build-readme.md` file to build the project.**
 2. **Clone the repository** (if you haven't already):
 
    ```sh
-   git clone https://github.com/finos/flowave-examples.git
+   git clone https://github.com/finos/fluxnova-examples.git
    ```
 
-3. **Build the flowave springboot example project:**
+3. **Build the fluxnova springboot example project:**
 
    ```sh
-   cd flowave-examples/flowave-springboot-example
+   cd fluxnova-examples/fluxnova-springboot-example
    mvn clean install
    ```
 
@@ -30,14 +30,14 @@ This is a sample Spring Boot application demonstrating the integration of all Fl
    mvn spring-boot:run
    ```
 
-5. **Access the Flowave application:**
+5. **Access the Fluxnova application:**
 
    Open your browser and go to:  
    [http://localhost:8080](http://localhost:8080)
 
 ## Notes
 
-- Make sure all Flowave dependencies are present in the `pom.xml`.
+- Make sure all Fluxnova dependencies are present in the `pom.xml`.
 - The application runs on port `8080` by default. You can change this in `application.yaml` if needed.
 
 ## Troubleshooting

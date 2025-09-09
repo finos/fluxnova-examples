@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:modeler="http://flowave.org/schema/modeler/1.0" xmlns:flowave="http://flowave.org/schema/1.0/bpmn" id="Definitions_0fr9mxs" exporter="Flowave Modeler" modeler:executionPlatform="Flowave Platform" targetNamespace="http://bpmn.io/schema/bpmn">
-  <bpmn:process id="example-flowave-process" isExecutable="true" camunda:historyTimeToLive="180">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:modeler="http://fluxnova.org/schema/modeler/1.0" xmlns:fluxnova="http://fluxnova.org/schema/1.0/bpmn" id="Definitions_0fr9mxs" exporter="Fluxnova Modeler" modeler:executionPlatform="Fluxnova Platform" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="example-fluxnova-process" isExecutable="true" camunda:historyTimeToLive="180">
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:outgoing>SequenceFlow_1fp17al</bpmn:outgoing>
     </bpmn:startEvent>
@@ -9,13 +9,13 @@
       <bpmn:incoming>SequenceFlow_16gzt2m</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_16gzt2m" sourceRef="say-hello" targetRef="EndEvent_0x6ir2l" />
-    <bpmn:userTask id="say-hello" name="Say hello to&#10;flowave" camunda:candidateUsers="flowave">
+    <bpmn:userTask id="say-hello" name="Say hello to&#10;fluxnova" camunda:candidateUsers="fluxnova">
       <bpmn:incoming>SequenceFlow_1fp17al</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_16gzt2m</bpmn:outgoing>
     </bpmn:userTask>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="example-flowave-process">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="example-fluxnova-process">
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
         <dc:Bounds x="179" y="99" width="36" height="36" />
       </bpmndi:BPMNShape>
