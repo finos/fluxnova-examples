@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://finos.org/schemas/common/contact-details.schema.json",
+  "title": "Contact Details",
+  "description": "Schema for contact details including email and phone numbers.",
+  "type": "object",
+  "required": ["emailAddress", "phoneNumber"],
+  "properties": {
+    "emailAddress": {
+      "type": "string",
+      "format": "email",
+      "description": "Primary email address"
+    },
+    "phoneNumber": {
+      "type": "string",
+      "pattern": "^\\+[1-9][0-9]{1,14}$",
+      "description": "Primary phone number in E.164 format"
+    },
+    "mobileNumber": {
+      "type": "string",
+      "pattern": "^\\+[1-9][0-9]{1,14}$",
+      "description": "Mobile phone number in E.164 format"
+    }
+  }
+}
