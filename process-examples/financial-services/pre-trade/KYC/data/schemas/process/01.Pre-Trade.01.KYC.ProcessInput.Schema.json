@@ -1,0 +1,374 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://finos.org/schemas/kyc/process-input.schema.json",
+  "title": "KYC Process Input Schema",
+  "description": "Schema for data required to initiate the Client Onboarding & KYC workflow",
+  "type": "object",
+  "required": [
+    "applicationId",
+    "submissionTimestamp",
+    "clientType",
+    "applicantDetails",
+    "jurisdiction",
+    "source"
+  ],
+  "properties": {
+    "applicationId": {
+      "type": "string",
+      "description": "Unique identifier for this onboarding application",
+      "pattern": "^APP-[0-9]{8}-[A-Z0-9]{6}$",
+      "examples": ["APP-20250108-A1B2C3"]
+    },
+    "submissionTimestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the application was submitted"
+    },
+    "clientType": {
+      "type": "string",
+      "enum": ["individual", "corporate"],
+      "description": "Type of client being onboarded"
+    },
+    "applicantDetails": {
+      "type": "object",
+      "description": "Basic details about the applicant",
+      "oneOf": [
+        { "$ref": "#/definitions/individualApplicant" },
+        { "$ref": "#/definitions/corporateApplicant" }
+      ]
+    },
+    "jurisdiction": {
+      "type": "string",
+      "description": "Primary jurisdiction/country code (ISO 3166-1 alpha-3)",
+      "pattern": "^[A-Z]{3}$",
+      "examples": ["GBR", "USA", "FRA"]
+    },
+    "source": {
+      "type": "object",
+      "description": "How this application was initiated",
+      "required": ["channel", "referenceId"],
+      "properties": {
+        "channel": {
+          "type": "string",
+          "enum": ["client-portal", "sales-referral", "broker-introduction", "direct-application"],
+          "description": "Channel through which application was submitted"
+        },
+        "referenceId": {
+          "type": "string",
+          "description": "Reference ID from the source system"
+        },
+        "salesRepresentative": {
+          "type": "string",
+          "description": "ID of sales representative if applicable"
+        }
+      }
+    },
+    "expectedTradingProfile": {
+      "type": "object",
+      "description": "Expected trading activity (used for risk assessment)",
+      "properties": {
+        "estimatedAnnualVolume": {
+          "type": "number",
+          "description": "Estimated annual trading volume in USD",
+          "minimum": 0
+        },
+        "assetClasses": {
+          "type": "array",
+          "description": "Asset classes the client intends to trade",
+          "items": {
+            "type": "string",
+            "enum": ["equities", "fixed-income", "fx", "commodities", "derivatives", "crypto"]
+          },
+          "minItems": 1
+        },
+        "tradingFrequency": {
+          "type": "string",
+          "enum": ["infrequent", "regular", "high-frequency"],
+          "description": "Expected frequency of trading activity"
+        }
+      }
+    },
+    "initialDepositAmount": {
+      "type": "number",
+      "description": "Initial deposit amount in USD",
+      "minimum": 0
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata for tracking and audit",
+      "properties": {
+        "ipAddress": {
+          "type": "string",
+          "description": "IP address from which application was submitted"
+        },
+        "userAgent": {
+          "type": "string",
+          "description": "User agent string if submitted via web"
+        },
+        "applicationVersion": {
+          "type": "string",
+          "description": "Version of the application form used"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "individualApplicant": {
+      "type": "object",
+      "required": ["title", "firstName", "lastName", "dateOfBirth", "nationality", "contactDetails"],
+      "properties": {
+        "title": {
+          "type": "string",
+          "enum": ["Mr", "Mrs", "Ms", "Miss", "Dr", "Prof", "Other"],
+          "description": "Title of the individual"
+        },
+        "firstName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "description": "First name(s) or given name(s)"
+        },
+        "middleNames": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Middle name(s) if applicable"
+        },
+        "lastName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "description": "Last name or surname"
+        },
+        "dateOfBirth": {
+          "type": "string",
+          "format": "date",
+          "description": "Date of birth in ISO 8601 format (YYYY-MM-DD)"
+        },
+        "nationality": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "Nationality (ISO 3166-1 alpha-3 country code)"
+        },
+        "secondNationality": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "Second nationality if dual citizenship"
+        },
+        "contactDetails": {
+          "$ref": "../../../../../schemas/common/contactDetails.schema.json"
+        },
+        "residentialAddress": {
+          "$ref": "../../../../../schemas/common/address.schema.json"
+        },
+        "taxResidency": {
+          "type": "array",
+          "description": "Countries where individual is tax resident",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "minItems": 1
+        },
+        "taxIdentificationNumber": {
+          "type": "string",
+          "description": "Tax identification number in primary tax residency"
+        },
+        "employmentStatus": {
+          "type": "string",
+          "enum": ["employed", "self-employed", "retired", "unemployed", "student"],
+          "description": "Current employment status"
+        },
+        "occupation": {
+          "type": "string",
+          "description": "Current occupation or profession"
+        },
+        "sourceOfWealth": {
+          "type": "string",
+          "enum": ["employment", "business-ownership", "inheritance", "investments", "property", "other"],
+          "description": "Primary source of wealth"
+        }
+      }
+    },
+    "corporateApplicant": {
+      "type": "object",
+      "required": ["legalName", "registrationNumber", "incorporationCountry", "incorporationDate", "legalForm", "contactDetails", "registeredAddress"],
+      "properties": {
+        "legalName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "Full legal name of the entity"
+        },
+        "tradingName": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Trading name if different from legal name"
+        },
+        "registrationNumber": {
+          "type": "string",
+          "description": "Company registration number"
+        },
+        "incorporationCountry": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "Country of incorporation (ISO 3166-1 alpha-3)"
+        },
+        "incorporationDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Date of incorporation"
+        },
+        "legalForm": {
+          "type": "string",
+          "enum": ["limited-company", "partnership", "llp", "trust", "foundation", "other"],
+          "description": "Legal form of the entity"
+        },
+        "taxIdentificationNumber": {
+          "type": "string",
+          "description": "Tax identification number"
+        },
+        "lei": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{20}$",
+          "description": "Legal Entity Identifier (LEI) if applicable"
+        },
+        "contactDetails": {
+          "$ref": "../../../../../schemas/common/contactDetails.schema.json"
+        },
+        "registeredAddress": {
+          "$ref": "../../../../../schemas/common/address.schema.json"
+        },
+        "businessAddress": {
+          "$ref": "../../../../../schemas/common/address.schema.json",
+          "description": "Principal place of business if different from registered address"
+        },
+        "industryClassification": {
+          "type": "string",
+          "description": "Industry classification code (e.g., NAICS, SIC)"
+        },
+        "businessDescription": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "Brief description of business activities"
+        },
+        "numberOfEmployees": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Approximate number of employees"
+        },
+        "annualRevenue": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Approximate annual revenue in USD"
+        },
+        "isListedEntity": {
+          "type": "boolean",
+          "description": "Whether entity is publicly listed"
+        },
+        "stockExchange": {
+          "type": "string",
+          "description": "Stock exchange if publicly listed"
+        },
+        "isRegulatedEntity": {
+          "type": "boolean",
+          "description": "Whether entity is regulated (e.g., bank, insurer)"
+        },
+        "regulatorName": {
+          "type": "string",
+          "description": "Name of regulator if applicable"
+        },
+        "beneficialOwners": {
+          "type": "array",
+          "description": "Individuals with >25% ownership or control",
+          "items": {
+            "$ref": "#/definitions/beneficialOwner"
+          }
+        },
+        "authorisedSignatories": {
+          "type": "array",
+          "description": "Individuals authorised to act on behalf of entity",
+          "items": {
+            "$ref": "#/definitions/authorisedSignatory"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "beneficialOwner": {
+      "type": "object",
+      "required": ["firstName", "lastName", "dateOfBirth", "nationality", "ownershipPercentage"],
+      "properties": {
+        "title": {
+          "type": "string",
+          "enum": ["Mr", "Mrs", "Ms", "Miss", "Dr", "Prof", "Other"]
+        },
+        "firstName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "lastName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "dateOfBirth": {
+          "type": "string",
+          "format": "date"
+        },
+        "nationality": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "ownershipPercentage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage of ownership or control"
+        },
+        "isPoliticallyExposed": {
+          "type": "boolean",
+          "description": "Whether individual is a Politically Exposed Person"
+        },
+        "residentialAddress": {
+          "$ref": "../../../../../schemas/common/address.schema.json"
+        }
+      }
+    },
+    "authorisedSignatory": {
+      "type": "object",
+      "required": ["firstName", "lastName", "position", "contactDetails"],
+      "properties": {
+        "title": {
+          "type": "string",
+          "enum": ["Mr", "Mrs", "Ms", "Miss", "Dr", "Prof", "Other"]
+        },
+        "firstName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "lastName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "position": {
+          "type": "string",
+          "description": "Position or title within the organisation"
+        },
+        "dateOfBirth": {
+          "type": "string",
+          "format": "date"
+        },
+        "nationality": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "contactDetails": {
+          "$ref": "../../../../../schemas/common/contactDetails.schema.json"
+        }
+      }
+    }
+  }
+}

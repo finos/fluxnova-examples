@@ -1,0 +1,348 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://finos.org/schemas/kyc/task/sanctions-screening-output.schema.json",
+  "title": "Sanctions & PEP Screening Task Output Schema",
+  "description": "Output from sanctions and politically exposed persons screening",
+  "type": "object",
+  "required": [
+    "taskId",
+    "applicationId",
+    "completedTimestamp",
+    "sanctionsMatch",
+    "isPEP",
+    "screeningResults"
+  ],
+  "properties": {
+    "taskId": {
+      "type": "string",
+      "description": "Unique identifier for this screening task instance",
+      "pattern": "^TASK-SANC-[0-9]{8}-[A-Z0-9]{6}$"
+    },
+    "applicationId": {
+      "type": "string",
+      "description": "Reference to the parent application ID",
+      "pattern": "^APP-[0-9]{8}-[A-Z0-9]{6}$"
+    },
+    "completedTimestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When screening was completed"
+    },
+    "sanctionsMatch": {
+      "type": "boolean",
+      "description": "Whether any sanctions matches were found"
+    },
+    "isPEP": {
+      "type": "boolean",
+      "description": "Whether individual or beneficial owners are politically exposed persons"
+    },
+    "overallRiskScore": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Overall risk score from screening (0-100)"
+    },
+    "screeningResults": {
+      "type": "object",
+      "description": "Detailed screening results",
+      "required": ["sanctionsScreening", "pepScreening", "adverseMediaScreening"],
+      "properties": {
+        "sanctionsScreening": {
+          "type": "object",
+          "properties": {
+            "listsScreened": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "OFAC-SDN",
+                  "OFAC-Consolidated",
+                  "UN-Sanctions",
+                  "EU-Sanctions",
+                  "UK-Sanctions",
+                  "HMT-Sanctions",
+                  "DFAT-Sanctions",
+                  "Interpol-Wanted"
+                ]
+              }
+            },
+            "matches": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/sanctionsMatch"
+              }
+            },
+            "totalMatches": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "pepScreening": {
+          "type": "object",
+          "properties": {
+            "pepMatches": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/pepMatch"
+              }
+            },
+            "totalPEPMatches": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "adverseMediaScreening": {
+          "type": "object",
+          "properties": {
+            "adverseMediaFound": {
+              "type": "boolean"
+            },
+            "matches": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/adverseMediaMatch"
+              }
+            },
+            "totalMatches": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        }
+      }
+    },
+    "entitiesScreened": {
+      "type": "array",
+      "description": "List of all entities screened (applicant + beneficial owners)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "entityId": {
+            "type": "string"
+          },
+          "entityType": {
+            "type": "string",
+            "enum": ["applicant", "beneficial-owner", "authorised-signatory"]
+          },
+          "name": {
+            "type": "string"
+          },
+          "screeningStatus": {
+            "type": "string",
+            "enum": ["clear", "potential-match", "confirmed-match"]
+          }
+        }
+      }
+    },
+    "screeningProvider": {
+      "type": "string",
+      "description": "Third-party screening provider used",
+      "examples": ["Dow Jones", "World-Check", "ComplyAdvantage", "LexisNexis"]
+    },
+    "processingDuration": {
+      "type": "number",
+      "description": "Time taken to complete screening in seconds"
+    },
+    "requiresInvestigation": {
+      "type": "boolean",
+      "description": "Whether matches require compliance investigation"
+    },
+    "autoScreeningDecision": {
+      "type": "string",
+      "enum": ["clear", "review-required", "block"],
+      "description": "Automated decision based on screening results"
+    }
+  },
+  "definitions": {
+    "sanctionsMatch": {
+      "type": "object",
+      "properties": {
+        "matchId": {
+          "type": "string"
+        },
+        "entityScreened": {
+          "type": "string",
+          "description": "Name of entity that was screened"
+        },
+        "matchedName": {
+          "type": "string",
+          "description": "Name on sanctions list"
+        },
+        "matchScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Confidence score for this match"
+        },
+        "matchType": {
+          "type": "string",
+          "enum": ["exact", "close", "possible"],
+          "description": "Type of match"
+        },
+        "sanctionsList": {
+          "type": "string",
+          "description": "Which sanctions list contains this entry"
+        },
+        "listingDate": {
+          "type": "string",
+          "format": "date",
+          "description": "When entity was added to sanctions list"
+        },
+        "sanctionType": {
+          "type": "string",
+          "description": "Type of sanction",
+          "enum": [
+            "asset-freeze",
+            "travel-ban",
+            "arms-embargo",
+            "financial-restrictions",
+            "trade-restrictions"
+          ]
+        },
+        "sanctioningAuthority": {
+          "type": "string",
+          "description": "Authority that imposed sanctions"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Reason for sanctions listing"
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Known aliases of sanctioned entity"
+        },
+        "dateOfBirth": {
+          "type": "string",
+          "format": "date",
+          "description": "Date of birth if available on list"
+        },
+        "nationality": {
+          "type": "string",
+          "description": "Nationality if available on list"
+        },
+        "additionalInfo": {
+          "type": "string"
+        }
+      }
+    },
+    "pepMatch": {
+      "type": "object",
+      "properties": {
+        "matchId": {
+          "type": "string"
+        },
+        "entityScreened": {
+          "type": "string"
+        },
+        "matchedName": {
+          "type": "string"
+        },
+        "matchScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "pepType": {
+          "type": "string",
+          "enum": [
+            "head-of-state",
+            "head-of-government",
+            "government-minister",
+            "senior-politician",
+            "senior-government-official",
+            "judicial-official",
+            "military-official",
+            "senior-executive-soe",
+            "political-party-official",
+            "rca",
+            "family-member",
+            "close-associate"
+          ],
+          "description": "Type of PEP (rca = relative or close associate)"
+        },
+        "position": {
+          "type": "string",
+          "description": "Official position held"
+        },
+        "country": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "Country where position is/was held"
+        },
+        "appointmentDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "terminationDate": {
+          "type": "string",
+          "format": "date",
+          "description": "When role ended (if applicable)"
+        },
+        "isCurrentlyActive": {
+          "type": "boolean",
+          "description": "Whether person currently holds PEP position"
+        },
+        "dateOfBirth": {
+          "type": "string",
+          "format": "date"
+        },
+        "additionalInfo": {
+          "type": "string"
+        }
+      }
+    },
+    "adverseMediaMatch": {
+      "type": "object",
+      "properties": {
+        "matchId": {
+          "type": "string"
+        },
+        "entityScreened": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "financial-crime",
+            "fraud",
+            "corruption",
+            "bribery",
+            "money-laundering",
+            "terrorism",
+            "organized-crime",
+            "cybercrime",
+            "regulatory-enforcement",
+            "other"
+          ]
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"]
+        },
+        "publicationDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "source": {
+          "type": "string",
+          "description": "Media source"
+        },
+        "headline": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    }
+  }
+}

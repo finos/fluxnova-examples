@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://finos.org/schemas/kyc/task/capture-client-data-input.schema.json",
+  "title": "Capture Client Data Task Input Schema",
+  "description": "Input data provided to the Capture Client Data user task from process variables",
+  "type": "object",
+  "required": [
+    "applicationId",
+    "submissionTimestamp",
+    "clientType",
+    "applicantDetails",
+    "jurisdiction",
+    "source"
+  ],
+  "properties": {
+    "applicationId": {
+      "type": "string",
+      "description": "Application ID from process start",
+      "pattern": "^APP-[0-9]{8}-[A-Z0-9]{6}$"
+    },
+    "submissionTimestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the application was originally submitted"
+    },
+    "clientType": {
+      "type": "string",
+      "enum": ["individual", "corporate"],
+      "description": "Type of client being onboarded"
+    },
+    "applicantDetails": {
+      "type": "object",
+      "description": "Applicant details provided at submission - may need review/completion",
+      "additionalProperties": true
+    },
+    "jurisdiction": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "Primary jurisdiction"
+    },
+    "source": {
+      "type": "object",
+      "description": "Application source information",
+      "properties": {
+        "channel": {
+          "type": "string"
+        },
+        "referenceId": {
+          "type": "string"
+        },
+        "salesRepresentative": {
+          "type": "string"
+        }
+      }
+    },
+    "expectedTradingProfile": {
+      "type": "object",
+      "description": "Expected trading activity",
+      "properties": {
+        "estimatedAnnualVolume": {
+          "type": "number"
+        },
+        "assetClasses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tradingFrequency": {
+          "type": "string"
+        }
+      }
+    },
+    "initialDepositAmount": {
+      "type": "number",
+      "description": "Initial deposit amount in USD"
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,167 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://finos.org/schemas/kyc/dmn/risk-assessment-output.schema.json",
+  "title": "AML/KYC Risk Assessment Output Schema",
+  "description": "Output from the DMN risk assessment decision including risk category and scoring breakdown",
+  "type": "object",
+  "required": [
+    "taskId",
+    "applicationId",
+    "completedTimestamp",
+    "riskCategory",
+    "overallRiskScore",
+    "riskFactors"
+  ],
+  "properties": {
+    "taskId": {
+      "type": "string",
+      "description": "Unique identifier for this risk assessment task instance",
+      "pattern": "^TASK-RISK-[0-9]{8}-[A-Z0-9]{6}$"
+    },
+    "applicationId": {
+      "type": "string",
+      "description": "Reference to the parent application ID",
+      "pattern": "^APP-[0-9]{8}-[A-Z0-9]{6}$"
+    },
+    "completedTimestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When risk assessment was completed"
+    },
+    "riskCategory": {
+      "type": "string",
+      "enum": ["Low", "Medium", "High"],
+      "description": "Overall risk category determined by DMN"
+    },
+    "overallRiskScore": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Composite risk score (0-100)"
+    },
+    "riskFactors": {
+      "type": "object",
+      "description": "Individual risk factors and their scores",
+      "required": [
+        "jurisdictionRisk",
+        "customerTypeRisk",
+        "productRisk",
+        "deliveryChannelRisk"
+      ],
+      "properties": {
+        "jurisdictionRisk": {
+          "$ref": "#/definitions/riskFactor"
+        },
+        "customerTypeRisk": {
+          "$ref": "#/definitions/riskFactor"
+        },
+        "productRisk": {
+          "$ref": "#/definitions/riskFactor"
+        },
+        "deliveryChannelRisk": {
+          "$ref": "#/definitions/riskFactor"
+        },
+        "pepRisk": {
+          "$ref": "#/definitions/riskFactor"
+        },
+        "volumeRisk": {
+          "$ref": "#/definitions/riskFactor"
+        },
+        "sourceOfFundsRisk": {
+          "$ref": "#/definitions/riskFactor"
+        },
+        "businessRelationshipRisk": {
+          "$ref": "#/definitions/riskFactor"
+        }
+      }
+    },
+    "dmnDecisionTable": {
+      "type": "string",
+      "description": "Name of the DMN decision table used",
+      "examples": ["RiskAssessment-v2.1"]
+    },
+    "dmnRuleMatched": {
+      "type": "string",
+      "description": "Identifier of the specific DMN rule that determined the risk category"
+    },
+    "riskMitigationRequired": {
+      "type": "boolean",
+      "description": "Whether additional risk mitigation measures are required"
+    },
+    "recommendedControls": {
+      "type": "array",
+      "description": "Recommended control measures based on risk assessment",
+      "items": {
+        "type": "string",
+        "enum": [
+          "enhanced-monitoring",
+          "senior-approval-required",
+          "source-of-funds-verification",
+          "enhanced-due-diligence",
+          "ongoing-monitoring",
+          "transaction-limits",
+          "periodic-review-required",
+          "additional-documentation"
+        ]
+      }
+    },
+    "autoApprovalEligible": {
+      "type": "boolean",
+      "description": "Whether case is eligible for auto-approval based on risk level"
+    },
+    "approvalAuthority": {
+      "type": "string",
+      "enum": ["system", "compliance-officer", "senior-compliance", "mlro"],
+      "description": "Level of authority required for approval (MLRO = Money Laundering Reporting Officer)"
+    },
+    "reviewFrequency": {
+      "type": "string",
+      "enum": ["annual", "semi-annual", "quarterly", "monthly"],
+      "description": "Recommended frequency for periodic review"
+    },
+    "processingDuration": {
+      "type": "number",
+      "description": "Time taken to complete risk assessment in seconds"
+    },
+    "assessmentNotes": {
+      "type": "string",
+      "description": "Additional notes or context from the risk assessment"
+    }
+  },
+  "definitions": {
+    "riskFactor": {
+      "type": "object",
+      "required": ["score", "rating", "weight"],
+      "properties": {
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Risk score for this factor (0-100)"
+        },
+        "rating": {
+          "type": "string",
+          "enum": ["Low", "Medium", "High"],
+          "description": "Risk rating for this factor"
+        },
+        "weight": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Weight of this factor in overall calculation (0-1)"
+        },
+        "rationale": {
+          "type": "string",
+          "description": "Explanation of why this rating was assigned"
+        },
+        "contributingFactors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Specific factors that contributed to this risk rating"
+        }
+      }
+    }
+  }
+}

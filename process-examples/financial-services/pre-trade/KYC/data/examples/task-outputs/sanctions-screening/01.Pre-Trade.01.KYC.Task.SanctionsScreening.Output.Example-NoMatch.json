@@ -1,0 +1,43 @@
+{
+  "taskId": "TASK-SANC-20250108-C4H8N2",
+  "applicationId": "APP-20250108-F7K9M2",
+  "completedTimestamp": "2025-01-08T14:46:15Z",
+  "sanctionsMatch": false,
+  "isPEP": false,
+  "overallRiskScore": 8.5,
+  "screeningResults": {
+    "sanctionsScreening": {
+      "listsScreened": [
+        "OFAC-SDN",
+        "OFAC-Consolidated",
+        "UN-Sanctions",
+        "EU-Sanctions",
+        "UK-Sanctions",
+        "HMT-Sanctions"
+      ],
+      "matches": [],
+      "totalMatches": 0
+    },
+    "pepScreening": {
+      "pepMatches": [],
+      "totalPEPMatches": 0
+    },
+    "adverseMediaScreening": {
+      "adverseMediaFound": false,
+      "matches": [],
+      "totalMatches": 0
+    }
+  },
+  "entitiesScreened": [
+    {
+      "entityId": "APPLICANT-001",
+      "entityType": "applicant",
+      "name": "Sarah Elizabeth Chen",
+      "screeningStatus": "clear"
+    }
+  ],
+  "screeningProvider": "Dow Jones",
+  "processingDuration": 3.8,
+  "requiresInvestigation": false,
+  "autoScreeningDecision": "clear"
+}

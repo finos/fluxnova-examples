@@ -1,0 +1,108 @@
+{
+  "applicationId": "APP-20250108-P2Q7W9",
+  "submissionTimestamp": "2025-01-08T16:48:33Z",
+  "clientType": "corporate",
+  "applicantDetails": {
+    "legalName": "Imaginary Commodities Trading DMCC",
+    "tradingName": "ICT",
+    "registrationNumber": "DMCC-789456",
+    "incorporationCountry": "ARE",
+    "incorporationDate": "2022-11-08",
+    "legalForm": "limited-company",
+    "taxIdentificationNumber": "AE100987654321",
+    "contactDetails": {
+      "emailAddress": "compliance@ict-trading.example",
+      "phoneNumber": "+97143211234"
+    },
+    "registeredAddress": {
+      "addressLine1": "Jumeirah Lakes Towers",
+      "addressLine2": "DMCC Business Centre",
+      "addressLine3": "Level 1, Jewellery & Gemplex 3",
+      "city": "Dubai",
+      "postalCode": "00000",
+      "country": "ARE"
+    },
+    "businessAddress": {
+      "addressLine1": "Jumeirah Lakes Towers",
+      "addressLine2": "DMCC Business Centre",
+      "addressLine3": "Level 1, Jewellery & Gemplex 3",
+      "city": "Dubai",
+      "postalCode": "00000",
+      "country": "ARE"
+    },
+    "industryClassification": "NAICS-425120",
+    "businessDescription": "International trading of precious metals, energy commodities, and agricultural products across emerging markets",
+    "numberOfEmployees": 12,
+    "annualRevenue": 45000000,
+    "isListedEntity": false,
+    "isRegulatedEntity": true,
+    "regulatorName": "Dubai Multi Commodities Centre Authority",
+    "beneficialOwners": [
+      {
+        "title": "Mr",
+        "firstName": "Dmitry",
+        "lastName": "Volkov",
+        "dateOfBirth": "1975-02-18",
+        "nationality": "RUS",
+        "ownershipPercentage": 60,
+        "isPoliticallyExposed": false,
+        "residentialAddress": {
+          "addressLine1": "Palm Jumeirah",
+          "addressLine2": "Villa 234",
+          "city": "Dubai",
+          "postalCode": "00000",
+          "country": "ARE"
+        }
+      },
+      {
+        "title": "Mr",
+        "firstName": "Yuri",
+        "lastName": "Suvarov",
+        "dateOfBirth": "1968-07-22",
+        "nationality": "CYP",
+        "secondNationality": "RUS",
+        "ownershipPercentage": 40,
+        "isPoliticallyExposed": true,
+        "residentialAddress": {
+          "addressLine1": "Marina District",
+          "addressLine2": "Apartment 1502",
+          "city": "Limassol",
+          "postalCode": "3036",
+          "country": "CYP"
+        }
+      }
+    ],
+    "authorisedSignatories": [
+      {
+        "title": "Mr",
+        "firstName": "Dmitry",
+        "lastName": "Volkov",
+        "position": "Managing Director",
+        "dateOfBirth": "1975-02-18",
+        "nationality": "RUS",
+        "contactDetails": {
+          "emailAddress": "d.volkov@ict-trading.example",
+          "phoneNumber": "+97143211234",
+          "mobileNumber": "+971501234567"
+        }
+      }
+    ]
+  },
+  "jurisdiction": "ARE",
+  "source": {
+    "channel": "broker-introduction",
+    "referenceId": "BRK-INT-2025-003",
+    "salesRepresentative": "SR-00187"
+  },
+  "expectedTradingProfile": {
+    "estimatedAnnualVolume": 75000000,
+    "assetClasses": ["commodities", "fx", "derivatives"],
+    "tradingFrequency": "high-frequency"
+  },
+  "initialDepositAmount": 2500000,
+  "metadata": {
+    "ipAddress": "185.220.101.45",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
+    "applicationVersion": "2.3.1"
+  }
+}

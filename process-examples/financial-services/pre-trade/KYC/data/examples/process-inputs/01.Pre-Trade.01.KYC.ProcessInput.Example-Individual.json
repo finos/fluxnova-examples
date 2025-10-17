@@ -1,0 +1,46 @@
+{
+  "applicationId": "APP-20250108-F7K9M2",
+  "submissionTimestamp": "2025-01-08T14:32:18Z",
+  "clientType": "individual",
+  "applicantDetails": {
+    "title": "Ms",
+    "firstName": "Sarah",
+    "middleNames": "Elizabeth",
+    "lastName": "Chen",
+    "dateOfBirth": "1985-06-15",
+    "nationality": "GBR",
+    "contactDetails": {
+      "emailAddress": "sarah.chen@example.com",
+      "phoneNumber": "+441632112233",
+      "mobileNumber": "+447700900123"
+    },
+    "residentialAddress": {
+      "addressLine1": "42 Kensington Garden Road",
+      "addressLine2": "Flat 3B",
+      "city": "London",
+      "postalCode": "W2 4BH",
+      "country": "GBR"
+    },
+    "taxResidency": ["GBR"],
+    "taxIdentificationNumber": "AB123456C",
+    "employmentStatus": "employed",
+    "occupation": "Software Engineer",
+    "sourceOfWealth": "employment"
+  },
+  "jurisdiction": "GBR",
+  "source": {
+    "channel": "client-portal",
+    "referenceId": "PORTAL-2025-0108-1432"
+  },
+  "expectedTradingProfile": {
+    "estimatedAnnualVolume": 150000,
+    "assetClasses": ["equities", "fixed-income"],
+    "tradingFrequency": "regular"
+  },
+  "initialDepositAmount": 50000,
+  "metadata": {
+    "ipAddress": "93.184.216.34",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+    "applicationVersion": "2.3.1"
+  }
+}

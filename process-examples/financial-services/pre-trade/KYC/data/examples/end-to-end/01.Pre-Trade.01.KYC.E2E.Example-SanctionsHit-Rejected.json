@@ -1,0 +1,306 @@
+{
+  "scenarioName": "Sanctions Hit - Application Rejected",
+  "scenarioDescription": "Corporate application with beneficial owner on sanctions list, leading to compliance investigation and ultimate rejection",
+  "processInstanceId": "PI-20250108-X8T2V5",
+  "processStartTime": "2025-01-08T09:45:12Z",
+  "processEndTime": "2025-01-08T15:32:45Z",
+  "totalProcessDuration": 20853,
+  "finalOutcome": "rejected",
+  "pathTaken": "Sanctions Match → Compliance Investigation → Sanctions Not Cleared → Rejected",
+  "processInput": {
+    "applicationId": "APP-20250108-X8T2V5",
+    "submissionTimestamp": "2025-01-08T09:45:12Z",
+    "clientType": "corporate",
+    "applicantDetails": {
+      "legalName": "Imaginary Trading Solutions Limited",
+      "registrationNumber": "11223344",
+      "incorporationCountry": "GBR",
+      "incorporationDate": "2020-05-15",
+      "legalForm": "limited-company",
+      "contactDetails": {
+        "emailAddress": "compliance@imaginarytrading.example",
+        "phoneNumber": "+441632445566"
+      },
+      "registeredAddress": {
+        "addressLine1": "45 Canary Wharf",
+        "city": "London",
+        "postalCode": "E14 5AB",
+        "country": "GBR"
+      },
+      "beneficialOwners": [
+        {
+          "firstName": "James",
+          "lastName": "Thompson",
+          "dateOfBirth": "1975-03-10",
+          "nationality": "GBR",
+          "ownershipPercentage": 40
+        },
+        {
+          "firstName": "Viktor",
+          "middleNames": "Mikhailovich",
+          "lastName": "Petrov",
+          "dateOfBirth": "1968-07-22",
+          "nationality": "RUS",
+          "ownershipPercentage": 60
+        }
+      ]
+    },
+    "jurisdiction": "GBR",
+    "source": {
+      "channel": "broker-introduction",
+      "referenceId": "BRK-2025-0015"
+    },
+    "expectedTradingProfile": {
+      "estimatedAnnualVolume": 8000000,
+      "assetClasses": [
+        "commodities",
+        "fx"
+      ],
+      "tradingFrequency": "high-frequency"
+    },
+    "initialDepositAmount": 1000000
+  },
+  "taskOutputs": {
+    "captureClientData": {
+      "taskId": "TASK-CAPTURE-20250108-C9X1Y2",
+      "completedTimestamp": "2025-01-08T09:52:18Z",
+      "completedBy": "USER-KYC-003",
+      "clientId": "CLI-20250108-000267",
+      "crmRecordCreated": true,
+      "crmRecordId": "CRM-2025-0108-000267"
+    },
+    "uploadDocuments": {
+      "taskId": "TASK-UPLOAD-20250108-U2V3W4",
+      "completedTimestamp": "2025-01-08T10:05:42Z",
+      "completedBy": "USER-KYC-003",
+      "documentsUploaded": [
+        {
+          "documentId": "DOC-2025-0108-045",
+          "documentType": "articles-of-incorporation",
+          "fileName": "articles_of_incorporation.pdf"
+        },
+        {
+          "documentId": "DOC-2025-0108-046",
+          "documentType": "shareholder-register",
+          "fileName": "shareholder_register.pdf"
+        },
+        {
+          "documentId": "DOC-2025-0108-047",
+          "documentType": "proof-of-address-commercial",
+          "fileName": "commercial_lease.pdf"
+        }
+      ],
+      "totalDocuments": 3
+    },
+    "verifyDocuments": {
+      "taskId": "TASK-VERIFY-20250108-V5B6N7",
+      "completedTimestamp": "2025-01-08T10:18:55Z",
+      "documentsVerified": true,
+      "overallConfidenceScore": 91.2,
+      "verificationResults": [
+        {
+          "documentId": "DOC-2025-0108-045",
+          "documentType": "articles-of-incorporation",
+          "verificationStatus": "verified",
+          "confidenceScore": 93.5
+        },
+        {
+          "documentId": "DOC-2025-0108-046",
+          "documentType": "shareholder-register",
+          "verificationStatus": "verified",
+          "confidenceScore": 90.8
+        },
+        {
+          "documentId": "DOC-2025-0108-047",
+          "documentType": "proof-of-address-commercial",
+          "verificationStatus": "verified",
+          "confidenceScore": 89.3
+        }
+      ],
+      "identityVerificationProvider": "Jumio",
+      "dataConsistencyCheck": {
+        "overallMatch": true
+      }
+    },
+    "sanctionsScreening": {
+      "taskId": "TASK-SANC-20250108-M7R3Q9",
+      "completedTimestamp": "2025-01-08T10:22:47Z",
+      "sanctionsMatch": true,
+      "isPEP": false,
+      "overallRiskScore": 95.8,
+      "screeningResults": {
+        "sanctionsScreening": {
+          "listsScreened": [
+            "OFAC-SDN",
+            "OFAC-Consolidated",
+            "UN-Sanctions",
+            "EU-Sanctions",
+            "UK-Sanctions"
+          ],
+          "matches": [
+            {
+              "matchId": "MATCH-SANC-001",
+              "entityScreened": "Viktor Mikhailovich Petrov",
+              "matchedName": "PETROV, Viktor Mikhailovich",
+              "matchScore": 94.7,
+              "matchType": "exact",
+              "sanctionsList": "OFAC-SDN",
+              "listingDate": "2022-03-15",
+              "sanctionType": "asset-freeze",
+              "reason": "Acting for or on behalf of designated entities"
+            },
+            {
+              "matchId": "MATCH-SANC-002",
+              "entityScreened": "Viktor Mikhailovich Petrov",
+              "matchedName": "PETROV, Viktor M.",
+              "matchScore": 91.3,
+              "matchType": "close",
+              "sanctionsList": "UK-Sanctions",
+              "listingDate": "2022-03-18",
+              "sanctionType": "asset-freeze"
+            }
+          ],
+          "totalMatches": 2
+        },
+        "pepScreening": {
+          "totalPEPMatches": 0
+        },
+        "adverseMediaScreening": {
+          "adverseMediaFound": true,
+          "totalMatches": 2
+        }
+      },
+      "entitiesScreened": [
+        {
+          "entityId": "APPLICANT-001",
+          "entityType": "applicant",
+          "name": "Imaginary Trading Solutions Limited",
+          "screeningStatus": "clear"
+        },
+        {
+          "entityId": "BO-001",
+          "entityType": "beneficial-owner",
+          "name": "James Thompson",
+          "screeningStatus": "clear"
+        },
+        {
+          "entityId": "BO-002",
+          "entityType": "beneficial-owner",
+          "name": "Viktor Mikhailovich Petrov",
+          "screeningStatus": "confirmed-match"
+        }
+      ],
+      "screeningProvider": "World-Check",
+      "requiresInvestigation": true,
+      "autoScreeningDecision": "block"
+    },
+    "complianceInvestigation": {
+      "taskId": "TASK-COMP-INV-20250108-I8K9L1",
+      "startedTimestamp": "2025-01-08T10:22:47Z",
+      "completedTimestamp": "2025-01-08T15:15:32Z",
+      "assignedTo": "USER-COMPLIANCE-SENIOR-002",
+      "investigationDuration": 17565,
+      "investigationFindings": {
+        "sanctionsMatchConfirmed": true,
+        "matchAccuracy": "exact-match",
+        "dateOfBirthMatches": true,
+        "nationalityMatches": true,
+        "additionalVerificationConducted": [
+          "Passport number cross-reference",
+          "Address history verification",
+          "Business association research",
+          "Regulatory database checks"
+        ],
+        "falsePositiveRuledOut": true,
+        "complianceOfficerNotes": "Confirmed exact match with OFAC SDN list entry. Date of birth, nationality, and known associates all match. Individual was added to sanctions list in March 2022 for activities supporting designated entities. UK HMT sanctions also confirmed. No basis for false positive determination. Application must be rejected per sanctions policy.",
+        "mlroConsulted": true,
+        "legalReviewConducted": true,
+        "recommendedAction": "reject-application",
+        "rejectionReason": "Beneficial owner appears on OFAC SDN and UK HMT sanctions lists",
+        "regulatoryReportingRequired": true,
+        "sarFiled": true,
+        "sarReferenceNumber": "SAR-2025-0108-0042"
+      },
+      "sanctionsCleared": false
+    }
+  },
+  "gatewayDecisions": {
+    "documentsVerified": {
+      "gatewayId": "Gateway_DocumentsVerified",
+      "evaluationTimestamp": "2025-01-08T10:18:55Z",
+      "conditionResult": true,
+      "pathTaken": "Yes → Sanctions Screening"
+    },
+    "sanctionsMatch": {
+      "gatewayId": "Gateway_SanctionsDecision",
+      "evaluationTimestamp": "2025-01-08T10:22:47Z",
+      "conditionEvaluated": "${sanctionsMatch == true}",
+      "conditionResult": true,
+      "pathTaken": "Yes → Compliance Investigation"
+    },
+    "sanctionsCleared": {
+      "gatewayId": "Gateway_SanctionsOutcome",
+      "evaluationTimestamp": "2025-01-08T15:15:32Z",
+      "conditionEvaluated": "${sanctionsCleared == true}",
+      "conditionResult": false,
+      "pathTaken": "No → Application Rejected"
+    }
+  },
+  "processVariables": {
+    "applicationId": "APP-20250108-X8T2V5",
+    "clientId": "CLI-20250108-000267",
+    "clientType": "corporate",
+    "documentsVerified": true,
+    "sanctionsMatch": true,
+    "sanctionsCleared": false,
+    "rejectionReason": "Beneficial owner on sanctions list (OFAC SDN, UK HMT)",
+    "sarFiled": true,
+    "onboardingComplete": false,
+    "finalStatus": "rejected"
+  },
+  "rejectionDetails": {
+    "rejectionTimestamp": "2025-01-08T15:32:45Z",
+    "rejectionReason": "Application rejected due to beneficial owner appearing on multiple sanctions lists (OFAC SDN, UK HMT). Firm policy prohibits business relationships with sanctioned individuals.",
+    "rejectedBy": "USER-COMPLIANCE-SENIOR-002",
+    "mlroApproval": "USER-MLRO-001",
+    "clientNotified": true,
+    "notificationMethod": "email",
+    "notificationTimestamp": "2025-01-08T15:35:12Z",
+    "notificationMessage": "Your application has been unsuccessful. We are unable to proceed with your account opening at this time.",
+    "internalRecordsUpdated": true,
+    "regulatoryReporting": {
+      "sarFiled": true,
+      "sarReference": "SAR-2025-0108-0042",
+      "filingTimestamp": "2025-01-08T15:20:15Z",
+      "reportingAuthority": "National Crime Agency"
+    }
+  },
+  "slaCompliance": {
+    "processLevelSLA": {
+      "slaThreshold": "PT120H",
+      "slaThresholdSeconds": 432000,
+      "actualDuration": 20853,
+      "slaStatus": "met",
+      "breachPercentage": 4.83
+    },
+    "taskLevelSLAs": {
+      "documentVerification": {
+        "slaStatus": "met"
+      },
+      "complianceInvestigation": {
+        "note": "Extended duration justified due to thoroughness required for sanctions investigation"
+      }
+    }
+  },
+  "complianceChecklist": {
+    "identityVerified": true,
+    "sanctionsScreeningComplete": true,
+    "complianceInvestigationComplete": true,
+    "mlroReviewed": true,
+    "appropriateDecisionMade": true,
+    "sarFiledWhereRequired": true,
+    "auditTrailRecorded": true,
+    "clientNotified": true,
+    "regulatoryRequirementsMet": true
+  }
+}

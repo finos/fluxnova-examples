@@ -1,0 +1,288 @@
+{
+  "scenarioName": "Low Risk Individual - Auto Approved",
+  "scenarioDescription": "Happy path for low-risk individual client proceeding directly to account opening without manual review",
+  "processInstanceId": "PI-20250108-F7K9M2",
+  "processStartTime": "2025-01-08T14:32:18Z",
+  "processEndTime": "2025-01-08T14:48:55Z",
+  "totalProcessDuration": 997,
+  "finalOutcome": "approved",
+  "pathTaken": "Low Risk → Auto Approval → Account Opened",
+  
+  "processInput": {
+    "applicationId": "APP-20250108-F7K9M2",
+    "submissionTimestamp": "2025-01-08T14:32:18Z",
+    "clientType": "individual",
+    "applicantDetails": {
+      "title": "Ms",
+      "firstName": "Sarah",
+      "middleNames": "Elizabeth",
+      "lastName": "Chen",
+      "dateOfBirth": "1985-06-15",
+      "nationality": "GBR",
+      "contactDetails": {
+        "emailAddress": "sarah.chen@example.com",
+        "phoneNumber": "+441632112233",
+        "mobileNumber": "+447700900123"
+      },
+      "residentialAddress": {
+        "addressLine1": "42 Kensington Garden Road",
+        "addressLine2": "Flat 3B",
+        "city": "London",
+        "postalCode": "W2 4BH",
+        "country": "GBR"
+      },
+      "taxResidency": ["GBR"],
+      "taxIdentificationNumber": "AB123456C",
+      "employmentStatus": "employed",
+      "occupation": "Software Engineer",
+      "sourceOfWealth": "employment"
+    },
+    "jurisdiction": "GBR",
+    "source": {
+      "channel": "client-portal",
+      "referenceId": "PORTAL-2025-0108-1432"
+    },
+    "expectedTradingProfile": {
+      "estimatedAnnualVolume": 150000,
+      "assetClasses": ["equities", "fixed-income"],
+      "tradingFrequency": "regular"
+    },
+    "initialDepositAmount": 50000
+  },
+
+  "taskOutputs": {
+    "captureClientData": {
+      "taskId": "TASK-CAPTURE-20250108-C1M2N3",
+      "completedTimestamp": "2025-01-08T14:35:42Z",
+      "completedBy": "USER-KYC-001",
+      "clientId": "CLI-20250108-000234",
+      "crmRecordCreated": true,
+      "crmRecordId": "CRM-2025-0108-000234",
+      "dataQualityScore": 98.5,
+      "dataCompleteness": "complete"
+    },
+    
+    "uploadDocuments": {
+      "taskId": "TASK-UPLOAD-20250108-U4D5E6",
+      "completedTimestamp": "2025-01-08T14:38:27Z",
+      "completedBy": "USER-KYC-001",
+      "documentsUploaded": [
+        {
+          "documentId": "DOC-2025-0108-001",
+          "documentType": "passport",
+          "fileName": "passport_scan.pdf",
+          "fileSize": 2048576,
+          "uploadTimestamp": "2025-01-08T14:37:15Z"
+        },
+        {
+          "documentId": "DOC-2025-0108-002",
+          "documentType": "proof-of-address-utility",
+          "fileName": "utility_bill_dec2024.pdf",
+          "fileSize": 1536789,
+          "uploadTimestamp": "2025-01-08T14:38:22Z"
+        }
+      ],
+      "totalDocuments": 2,
+      "storageLocation": "s3://kyc-documents/2025/01/08/APP-20250108-F7K9M2/"
+    },
+
+    "verifyDocuments": {
+      "taskId": "TASK-VERIFY-20250108-V7M3K1",
+      "completedTimestamp": "2025-01-08T14:45:32Z",
+      "documentsVerified": true,
+      "overallConfidenceScore": 94.5,
+      "verificationResults": [
+        {
+          "documentId": "DOC-2025-0108-001",
+          "documentType": "passport",
+          "verificationStatus": "verified",
+          "confidenceScore": 96.2
+        },
+        {
+          "documentId": "DOC-2025-0108-002",
+          "documentType": "proof-of-address-utility",
+          "verificationStatus": "verified",
+          "confidenceScore": 92.8
+        }
+      ],
+      "biometricChecks": {
+        "faceMatch": {
+          "performed": true,
+          "passed": true,
+          "confidenceScore": 95.3,
+          "livenessCheckPassed": true
+        }
+      },
+      "identityVerificationProvider": "Onfido",
+      "dataConsistencyCheck": {
+        "nameMatch": true,
+        "dateOfBirthMatch": true,
+        "addressMatch": true,
+        "overallMatch": true
+      }
+    },
+
+    "sanctionsScreening": {
+      "taskId": "TASK-SANC-20250108-C4H8N2",
+      "completedTimestamp": "2025-01-08T14:46:15Z",
+      "sanctionsMatch": false,
+      "isPEP": false,
+      "overallRiskScore": 8.5,
+      "screeningResults": {
+        "sanctionsScreening": {
+          "totalMatches": 0
+        },
+        "pepScreening": {
+          "totalPEPMatches": 0
+        },
+        "adverseMediaScreening": {
+          "adverseMediaFound": false,
+          "totalMatches": 0
+        }
+      },
+      "screeningProvider": "Dow Jones",
+      "autoScreeningDecision": "clear"
+    },
+
+    "riskAssessment": {
+      "taskId": "TASK-RISK-20250108-L2N8M4",
+      "completedTimestamp": "2025-01-08T14:46:42Z",
+      "riskCategory": "Low",
+      "overallRiskScore": 22.5,
+      "dmnDecisionTable": "RiskAssessment-v2.1",
+      "dmnRuleMatched": "RULE-001-LOW",
+      "autoApprovalEligible": true,
+      "approvalAuthority": "system",
+      "recommendedControls": ["ongoing-monitoring"],
+      "reviewFrequency": "annual"
+    },
+
+    "accountOpening": {
+      "taskId": "TASK-ACCT-20250108-A8O9P1",
+      "completedTimestamp": "2025-01-08T14:47:28Z",
+      "accountNumber": "GB29FBOC12345678901234",
+      "accountStatus": "active",
+      "tradingEnabled": true,
+      "productAccess": ["equities", "fixed-income"],
+      "accountLimits": {
+        "dailyTradingLimit": 50000,
+        "positionLimit": 200000
+      },
+      "custodianAccount": "CUST-2025-000234",
+      "clearingAccount": "CLR-2025-000234"
+    },
+
+    "notifySalesClient": {
+      "taskId": "TASK-NOTIF-20250108-N2T3Y4",
+      "completedTimestamp": "2025-01-08T14:48:12Z",
+      "notifications": [
+        {
+          "recipient": "sarah.chen@example.com",
+          "type": "email",
+          "subject": "Account Opened - Welcome",
+          "sentTimestamp": "2025-01-08T14:48:05Z",
+          "status": "delivered"
+        },
+        {
+          "recipient": "+447700900123",
+          "type": "sms",
+          "message": "Your trading account is now active. Account: GB29FBOC12345...",
+          "sentTimestamp": "2025-01-08T14:48:08Z",
+          "status": "delivered"
+        },
+        {
+          "recipient": "sales-team@fakebank.example",
+          "type": "email",
+          "subject": "Client Onboarded - Sarah Chen (CLI-20250108-000234)",
+          "sentTimestamp": "2025-01-08T14:48:10Z",
+          "status": "delivered"
+        }
+      ]
+    },
+
+    "recordAuditTrail": {
+      "taskId": "TASK-AUDIT-20250108-R5K6L7",
+      "completedTimestamp": "2025-01-08T14:48:55Z",
+      "auditRecordId": "AUDIT-2025-0108-000234",
+      "recordingSystem": "compliance-audit-db",
+      "dataRetentionPeriod": "7-years",
+      "recordComplete": true
+    }
+  },
+
+  "gatewayDecisions": {
+    "documentsVerified": {
+      "gatewayId": "Gateway_DocumentsVerified",
+      "evaluationTimestamp": "2025-01-08T14:45:32Z",
+      "conditionEvaluated": "${documentsVerified == true}",
+      "conditionResult": true,
+      "pathTaken": "Yes → Sanctions Screening"
+    },
+    
+    "sanctionsMatch": {
+      "gatewayId": "Gateway_SanctionsDecision",
+      "evaluationTimestamp": "2025-01-08T14:46:15Z",
+      "conditionEvaluated": "${sanctionsMatch == true}",
+      "conditionResult": false,
+      "pathTaken": "No → Risk Assessment"
+    },
+
+    "riskCategory": {
+      "gatewayId": "Gateway_RiskCategory",
+      "evaluationTimestamp": "2025-01-08T14:46:42Z",
+      "conditionEvaluated": "${riskCategory == 'Low'}",
+      "conditionResult": true,
+      "pathTaken": "Low → Account Opening (Auto-Approved)"
+    }
+  },
+
+  "processVariables": {
+    "applicationId": "APP-20250108-F7K9M2",
+    "clientId": "CLI-20250108-000234",
+    "clientType": "individual",
+    "documentsVerified": true,
+    "sanctionsMatch": false,
+    "isPEP": false,
+    "riskCategory": "Low",
+    "overallRiskScore": 22.5,
+    "autoApprovalEligible": true,
+    "accountNumber": "GB29FBOC12345678901234",
+    "onboardingComplete": true
+  },
+
+  "slaCompliance": {
+    "processLevelSLA": {
+      "slaThreshold": "PT120H",
+      "slaThresholdSeconds": 432000,
+      "actualDuration": 997,
+      "slaStatus": "met",
+      "breachPercentage": 0.23
+    },
+    "taskLevelSLAs": {
+      "documentVerification": {
+        "slaThreshold": "PT48H",
+        "slaThresholdSeconds": 172800,
+        "actualDuration": 425,
+        "slaStatus": "met"
+      },
+      "riskAssessment": {
+        "slaThreshold": "PT24H",
+        "slaThresholdSeconds": 86400,
+        "actualDuration": 10,
+        "slaStatus": "met"
+      }
+    }
+  },
+
+  "complianceChecklist": {
+    "identityVerified": true,
+    "addressVerified": true,
+    "sanctionsScreeningComplete": true,
+    "pepScreeningComplete": true,
+    "riskAssessmentComplete": true,
+    "appropriateApprovalObtained": true,
+    "auditTrailRecorded": true,
+    "clientNotified": true,
+    "regulatoryRequirementsMet": true
+  }
+}

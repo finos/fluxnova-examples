@@ -1,0 +1,200 @@
+{
+  "metadata": {
+    "lastUpdated": "2025-01-08",
+    "version": "1.0",
+    "description": "Country risk classifications for KYC purposes based on FATF compliance, corruption indices, and regulatory frameworks",
+    "sources": [
+      "FATF High-Risk Jurisdictions",
+      "Transparency International Corruption Perceptions Index",
+      "Basel AML Index",
+      "Internal risk assessment framework"
+    ]
+  },
+  "countries": [
+    {
+      "countryCode": "GBR",
+      "countryName": "United Kingdom",
+      "region": "Europe",
+      "riskClassification": "Low",
+      "riskScore": 15,
+      "fatfCompliant": true,
+      "fatfStatus": "compliant",
+      "corruptionPerceptionIndex": 73,
+      "baselAMLIndex": 3.52,
+      "riskFactors": {
+        "regulatoryFramework": "Strong",
+        "amlEnforcement": "Strong",
+        "transparencyLevel": "High",
+        "politicalStability": "Stable"
+      },
+      "additionalNotes": "G7 member, strong FCA oversight, robust AML/CFT framework"
+    },
+    {
+      "countryCode": "USA",
+      "countryName": "United States",
+      "region": "North America",
+      "riskClassification": "Low",
+      "riskScore": 18,
+      "fatfCompliant": true,
+      "fatfStatus": "compliant",
+      "corruptionPerceptionIndex": 69,
+      "baselAMLIndex": 3.95,
+      "riskFactors": {
+        "regulatoryFramework": "Strong",
+        "amlEnforcement": "Strong",
+        "transparencyLevel": "High",
+        "politicalStability": "Stable"
+      },
+      "additionalNotes": "SEC and FinCEN oversight, comprehensive regulatory framework"
+    },
+    {
+      "countryCode": "ARE",
+      "countryName": "United Arab Emirates",
+      "region": "Middle East",
+      "riskClassification": "Medium-High",
+      "riskScore": 65,
+      "fatfCompliant": true,
+      "fatfStatus": "recent-improvements",
+      "corruptionPerceptionIndex": 67,
+      "baselAMLIndex": 5.82,
+      "riskFactors": {
+        "regulatoryFramework": "Developing",
+        "amlEnforcement": "Moderate",
+        "transparencyLevel": "Moderate",
+        "politicalStability": "Stable",
+        "cashIntensiveEconomy": true,
+        "freeTradeZones": true
+      },
+      "additionalNotes": "Removed from FATF grey list in 2024 after implementing reforms. Free trade zones present enhanced risk."
+    },
+    {
+      "countryCode": "RUS",
+      "countryName": "Russian Federation",
+      "region": "Eastern Europe",
+      "riskClassification": "High",
+      "riskScore": 85,
+      "fatfCompliant": false,
+      "fatfStatus": "suspended",
+      "corruptionPerceptionIndex": 28,
+      "baselAMLIndex": 7.45,
+      "riskFactors": {
+        "regulatoryFramework": "Weak",
+        "amlEnforcement": "Weak",
+        "transparencyLevel": "Low",
+        "politicalStability": "Unstable",
+        "sanctionsRisk": true,
+        "geopoliticalRisk": true
+      },
+      "additionalNotes": "FATF membership suspended. Significant sanctions regime in place. Enhanced due diligence mandatory."
+    },
+    {
+      "countryCode": "CYP",
+      "countryName": "Cyprus",
+      "region": "Europe",
+      "riskClassification": "Medium",
+      "riskScore": 50,
+      "fatfCompliant": true,
+      "fatfStatus": "compliant",
+      "corruptionPerceptionIndex": 52,
+      "baselAMLIndex": 5.34,
+      "riskFactors": {
+        "regulatoryFramework": "Moderate",
+        "amlEnforcement": "Moderate",
+        "transparencyLevel": "Moderate",
+        "politicalStability": "Stable",
+        "offshoreFinanceCentre": true
+      },
+      "additionalNotes": "EU member but historically used for complex structures. Enhanced due diligence recommended for corporate entities."
+    },
+    {
+      "countryCode": "SGP",
+      "countryName": "Singapore",
+      "region": "Asia",
+      "riskClassification": "Low",
+      "riskScore": 17,
+      "fatfCompliant": true,
+      "fatfStatus": "compliant",
+      "corruptionPerceptionIndex": 83,
+      "baselAMLIndex": 2.98,
+      "riskFactors": {
+        "regulatoryFramework": "Strong",
+        "amlEnforcement": "Strong",
+        "transparencyLevel": "High",
+        "politicalStability": "Very Stable"
+      },
+      "additionalNotes": "MAS oversight, excellent regulatory framework, major financial centre"
+    },
+    {
+      "countryCode": "PRK",
+      "countryName": "North Korea",
+      "region": "Asia",
+      "riskClassification": "Prohibited",
+      "riskScore": 100,
+      "fatfCompliant": false,
+      "fatfStatus": "high-risk",
+      "corruptionPerceptionIndex": null,
+      "baselAMLIndex": null,
+      "riskFactors": {
+        "regulatoryFramework": "None",
+        "amlEnforcement": "None",
+        "transparencyLevel": "None",
+        "politicalStability": "Unstable",
+        "sanctionsRisk": true,
+        "fatfBlacklisted": true
+      },
+      "additionalNotes": "FATF call for countermeasures. Comprehensive sanctions. Business prohibited."
+    },
+    {
+      "countryCode": "IRN",
+      "countryName": "Iran",
+      "region": "Middle East",
+      "riskClassification": "Prohibited",
+      "riskScore": 100,
+      "fatfCompliant": false,
+      "fatfStatus": "high-risk",
+      "corruptionPerceptionIndex": 27,
+      "baselAMLIndex": 8.92,
+      "riskFactors": {
+        "regulatoryFramework": "Weak",
+        "amlEnforcement": "Weak",
+        "transparencyLevel": "Low",
+        "politicalStability": "Unstable",
+        "sanctionsRisk": true,
+        "fatfBlacklisted": true
+      },
+      "additionalNotes": "FATF call for countermeasures. Comprehensive sanctions. Business prohibited."
+    }
+  ],
+  "riskClassificationDefinitions": {
+    "Low": {
+      "scoreRange": "0-25",
+      "description": "Strong regulatory frameworks, FATF compliant, low corruption",
+      "enhancedDueDiligence": false,
+      "approvalLevel": "standard"
+    },
+    "Medium": {
+      "scoreRange": "26-50",
+      "description": "Adequate frameworks but some concerns",
+      "enhancedDueDiligence": "recommended",
+      "approvalLevel": "enhanced-review"
+    },
+    "Medium-High": {
+      "scoreRange": "51-75",
+      "description": "Significant concerns around AML/CFT framework",
+      "enhancedDueDiligence": "required",
+      "approvalLevel": "senior-approval"
+    },
+    "High": {
+      "scoreRange": "76-95",
+      "description": "Weak frameworks, high corruption, FATF concerns",
+      "enhancedDueDiligence": "mandatory",
+      "approvalLevel": "mlro-approval"
+    },
+    "Prohibited": {
+      "scoreRange": "96-100",
+      "description": "Comprehensive sanctions or FATF countermeasures",
+      "enhancedDueDiligence": "not-applicable",
+      "approvalLevel": "prohibited"
+    }
+  }
+}

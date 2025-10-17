@@ -1,0 +1,116 @@
+{
+  "applicationId": "APP-20250108-T3R8N5",
+  "submissionTimestamp": "2025-01-08T09:15:42Z",
+  "clientType": "corporate",
+  "applicantDetails": {
+    "legalName": "MaedUp Technology Solutions Limited",
+    "tradingName": "MaedUp Tech",
+    "registrationNumber": "09876543",
+    "incorporationCountry": "GBR",
+    "incorporationDate": "2018-03-22",
+    "legalForm": "limited-company",
+    "taxIdentificationNumber": "GB123456789",
+    "lei": "213800ABCDEF12345678",
+    "contactDetails": {
+      "emailAddress": "corporate.finance@maeduptech.example",
+      "phoneNumber": "+441632556677"
+    },
+    "registeredAddress": {
+      "addressLine1": "Technology House",
+      "addressLine2": "15 Bishopsgate",
+      "city": "London",
+      "postalCode": "EC2N 3AR",
+      "country": "GBR"
+    },
+    "businessAddress": {
+      "addressLine1": "Technology House",
+      "addressLine2": "15 Bishopsgate",
+      "city": "London",
+      "postalCode": "EC2N 3AR",
+      "country": "GBR"
+    },
+    "industryClassification": "NAICS-541511",
+    "businessDescription": "Provider of enterprise software solutions and technology consulting services to financial services sector",
+    "numberOfEmployees": 85,
+    "annualRevenue": 12500000,
+    "isListedEntity": false,
+    "isRegulatedEntity": false,
+    "beneficialOwners": [
+      {
+        "title": "Mr",
+        "firstName": "Thomas",
+        "lastName": "Anderson",
+        "dateOfBirth": "1978-09-12",
+        "nationality": "GBR",
+        "ownershipPercentage": 55,
+        "isPoliticallyExposed": false,
+        "residentialAddress": {
+          "addressLine1": "28 Richmond Hill",
+          "city": "Richmond",
+          "postalCode": "TW10 6QX",
+          "country": "GBR"
+        }
+      },
+      {
+        "title": "Ms",
+        "firstName": "Priya",
+        "lastName": "Sharma",
+        "dateOfBirth": "1982-04-28",
+        "nationality": "GBR",
+        "ownershipPercentage": 45,
+        "isPoliticallyExposed": false,
+        "residentialAddress": {
+          "addressLine1": "12 Oakwood Avenue",
+          "city": "Cambridge",
+          "postalCode": "CB4 1HF",
+          "country": "GBR"
+        }
+      }
+    ],
+    "authorisedSignatories": [
+      {
+        "title": "Mr",
+        "firstName": "Thomas",
+        "lastName": "Anderson",
+        "position": "Chief Executive Officer",
+        "dateOfBirth": "1978-09-12",
+        "nationality": "GBR",
+        "contactDetails": {
+          "emailAddress": "j.anderson@maeduptech.example",
+          "phoneNumber": "+441632556677",
+          "mobileNumber": "+447700900234"
+        }
+      },
+      {
+        "title": "Ms",
+        "firstName": "Catherine",
+        "lastName": "Williams",
+        "position": "Chief Financial Officer",
+        "dateOfBirth": "1985-11-03",
+        "nationality": "GBR",
+        "contactDetails": {
+          "emailAddress": "c.williams@maeduptech.example",
+          "phoneNumber": "+441632556688",
+          "mobileNumber": "+447700900235"
+        }
+      }
+    ]
+  },
+  "jurisdiction": "GBR",
+  "source": {
+    "channel": "sales-referral",
+    "referenceId": "SALES-REF-2025-0012",
+    "salesRepresentative": "SR-00234"
+  },
+  "expectedTradingProfile": {
+    "estimatedAnnualVolume": 5000000,
+    "assetClasses": ["fixed-income", "fx"],
+    "tradingFrequency": "regular"
+  },
+  "initialDepositAmount": 500000,
+  "metadata": {
+    "ipAddress": "203.0.113.45",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "applicationVersion": "2.3.1"
+  }
+}

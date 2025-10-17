@@ -1,0 +1,105 @@
+{
+  "taskId": "TASK-VERIFY-20250108-V7M3K1",
+  "applicationId": "APP-20250108-F7K9M2",
+  "completedTimestamp": "2025-01-08T14:45:32Z",
+  "documentsVerified": true,
+  "overallConfidenceScore": 94.5,
+  "verificationResults": [
+    {
+      "documentId": "DOC-2025-0108-001",
+      "documentType": "passport",
+      "verificationStatus": "verified",
+      "confidenceScore": 96.2,
+      "checks": {
+        "documentAuthenticity": {
+          "passed": true,
+          "score": 98.1
+        },
+        "visualAuthenticity": {
+          "passed": true,
+          "score": 95.7
+        },
+        "ocrReadability": {
+          "passed": true,
+          "score": 97.3
+        },
+        "imageQuality": {
+          "passed": true,
+          "score": 92.8
+        },
+        "documentExpiry": {
+          "passed": true,
+          "expiryDate": "2030-06-14"
+        },
+        "securityFeatures": {
+          "passed": true,
+          "featuresDetected": [
+            "hologram",
+            "watermark",
+            "microprinting",
+            "uv-features"
+          ]
+        }
+      },
+      "issueDate": "2020-06-15",
+      "expiryDate": "2030-06-14",
+      "issuingCountry": "GBR",
+      "warningsDetected": [],
+      "processingNotes": "All security features verified successfully"
+    },
+    {
+      "documentId": "DOC-2025-0108-002",
+      "documentType": "proof-of-address-utility",
+      "verificationStatus": "verified",
+      "confidenceScore": 92.8,
+      "checks": {
+        "documentAuthenticity": {
+          "passed": true,
+          "score": 93.5
+        },
+        "visualAuthenticity": {
+          "passed": true,
+          "score": 91.2
+        },
+        "ocrReadability": {
+          "passed": true,
+          "score": 94.7
+        },
+        "imageQuality": {
+          "passed": true,
+          "score": 90.4
+        }
+      },
+      "issuingCountry": "GBR",
+      "warningsDetected": [],
+      "processingNotes": "Utility bill from British Gas dated within last 3 months"
+    }
+  ],
+  "biometricChecks": {
+    "faceMatch": {
+      "performed": true,
+      "passed": true,
+      "confidenceScore": 95.3,
+      "livenessCheckPassed": true
+    }
+  },
+  "identityVerificationProvider": "Onfido",
+  "verificationMethod": "automated",
+  "extractedData": {
+    "fullName": "SARAH ELIZABETH CHEN",
+    "dateOfBirth": "1985-06-15",
+    "documentNumber": "525678901",
+    "nationality": "GBR",
+    "expiryDate": "2030-06-14",
+    "address": "42 Kensington Garden Road, Flat 3B, London, W2 4BH"
+  },
+  "dataConsistencyCheck": {
+    "nameMatch": true,
+    "dateOfBirthMatch": true,
+    "addressMatch": true,
+    "overallMatch": true,
+    "discrepancies": []
+  },
+  "processingDuration": 127.5,
+  "reviewRequired": false
+}

@@ -1,0 +1,120 @@
+{
+  "taskId": "TASK-VERIFY-20250108-X9P4L7",
+  "applicationId": "APP-20250108-B3N7R8",
+  "completedTimestamp": "2025-01-08T11:23:18Z",
+  "documentsVerified": false,
+  "overallConfidenceScore": 42.3,
+  "verificationResults": [
+    {
+      "documentId": "DOC-2025-0108-015",
+      "documentType": "passport",
+      "verificationStatus": "failed",
+      "confidenceScore": 38.7,
+      "checks": {
+        "documentAuthenticity": {
+          "passed": false,
+          "score": 34.2
+        },
+        "visualAuthenticity": {
+          "passed": false,
+          "score": 41.8
+        },
+        "ocrReadability": {
+          "passed": true,
+          "score": 78.3
+        },
+        "imageQuality": {
+          "passed": false,
+          "score": 45.6
+        },
+        "documentExpiry": {
+          "passed": true,
+          "expiryDate": "2028-03-10"
+        },
+        "securityFeatures": {
+          "passed": false,
+          "featuresDetected": [
+            "watermark"
+          ]
+        }
+      },
+      "issueDate": "2018-03-11",
+      "expiryDate": "2028-03-10",
+      "issuingCountry": "GBR",
+      "warningsDetected": [
+        "Missing expected security features",
+        "Poor image quality - possible photocopy",
+        "Visual inconsistencies detected in document structure"
+      ],
+      "processingNotes": "Document appears to be a photocopy rather than original scan. Multiple security features absent or not detected."
+    },
+    {
+      "documentId": "DOC-2025-0108-016",
+      "documentType": "proof-of-address-utility",
+      "verificationStatus": "failed",
+      "confidenceScore": 45.9,
+      "checks": {
+        "documentAuthenticity": {
+          "passed": false,
+          "score": 52.3
+        },
+        "visualAuthenticity": {
+          "passed": false,
+          "score": 48.1
+        },
+        "ocrReadability": {
+          "passed": true,
+          "score": 81.4
+        },
+        "imageQuality": {
+          "passed": true,
+          "score": 67.9
+        }
+      },
+      "issuingCountry": "GBR",
+      "warningsDetected": [
+        "Document date exceeds 3-month validity period",
+        "Possible digital manipulation detected"
+      ],
+      "processingNotes": "Utility bill dated 7 months ago. Evidence of potential alteration in date field."
+    }
+  ],
+  "biometricChecks": {
+    "faceMatch": {
+      "performed": true,
+      "passed": false,
+      "confidenceScore": 58.4,
+      "livenessCheckPassed": false
+    }
+  },
+  "identityVerificationProvider": "Onfido",
+  "verificationMethod": "automated",
+  "failureReasons": [
+    "Document authenticity check failed for passport",
+    "Proof of address exceeds validity period",
+    "Biometric face match below threshold",
+    "Liveness check failed - possible photo of photo",
+    "Multiple security features missing from identity document"
+  ],
+  "extractedData": {
+    "fullName": "JOHN MICHAEL SMITH",
+    "dateOfBirth": "1990-05-22",
+    "documentNumber": "712345678",
+    "nationality": "GBR",
+    "expiryDate": "2028-03-10",
+    "address": "15 High Street, Manchester, M1 1AA"
+  },
+  "dataConsistencyCheck": {
+    "nameMatch": true,
+    "dateOfBirthMatch": true,
+    "addressMatch": false,
+    "overallMatch": false,
+    "discrepancies": [
+      "Address on proof of address does not match address provided in application",
+      "Application stated '17 High Street' but document shows '15 High Street'"
+    ]
+  },
+  "processingDuration": 243.7,
+  "reviewRequired": true,
+  "reviewReason": "Multiple verification failures including document authenticity and biometric checks"
+}
