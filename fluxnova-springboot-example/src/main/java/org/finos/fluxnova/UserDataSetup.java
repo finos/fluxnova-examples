@@ -1,6 +1,6 @@
-package org.finos.flowave;
+package org.finos.fluxnova;
 
-import org.finos.flowave.service.UserService;
+import org.finos.fluxnova.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

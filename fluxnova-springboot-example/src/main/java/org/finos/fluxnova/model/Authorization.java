@@ -1,4 +1,4 @@
-package org.finos.flowave.model;
+package org.finos.fluxnova.model;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package org.finos.flowave.util;
+package org.finos.fluxnova.util;
 
 import java.util.Arrays;
 import java.util.Collections;

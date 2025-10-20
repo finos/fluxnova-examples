@@ -1,13 +1,13 @@
-package org.finos.flowave.service;
+package org.finos.fluxnova.service;
 
-import org.finos.flowave.config.UserConfig;
-import org.finos.flowave.mapper.AuthorizationProperties;
-import org.finos.flowave.mapper.GroupProperties;
-import org.finos.flowave.mapper.UserProperties;
-import org.finos.flowave.model.Authorization;
-import org.finos.flowave.model.Group;
-import org.finos.flowave.model.User;
-import org.finos.flowave.util.ResourcePermissionMapper;
+import org.finos.fluxnova.config.UserConfig;
+import org.finos.fluxnova.mapper.AuthorizationProperties;
+import org.finos.fluxnova.mapper.GroupProperties;
+import org.finos.fluxnova.mapper.UserProperties;
+import org.finos.fluxnova.model.Authorization;
+import org.finos.fluxnova.model.Group;
+import org.finos.fluxnova.model.User;
+import org.finos.fluxnova.util.ResourcePermissionMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package org.finos.flowave.mapper;
+package org.finos.fluxnova.mapper;
 
 public class AuthorizationProperties {
     private int type;

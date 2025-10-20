@@ -1,8 +1,8 @@
-package org.finos.flowave.config;
+package org.finos.fluxnova.config;
 
-import org.finos.flowave.mapper.AuthorizationProperties;
-import org.finos.flowave.mapper.GroupProperties;
-import org.finos.flowave.mapper.UserProperties;
+import org.finos.fluxnova.mapper.AuthorizationProperties;
+import org.finos.fluxnova.mapper.GroupProperties;
+import org.finos.fluxnova.mapper.UserProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;

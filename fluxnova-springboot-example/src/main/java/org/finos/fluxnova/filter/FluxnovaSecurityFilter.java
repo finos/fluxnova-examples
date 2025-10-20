@@ -1,4 +1,4 @@
-package org.finos.flowave.filter;
+package org.finos.fluxnova.filter;
 
 import jakarta.servlet.Filter;
 import org.finos.fluxnova.bpm.engine.rest.security.auth.ProcessEngineAuthenticationFilter;

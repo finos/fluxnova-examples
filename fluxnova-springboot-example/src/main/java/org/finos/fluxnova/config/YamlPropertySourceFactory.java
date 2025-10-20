@@ -1,4 +1,4 @@
-package org.finos.flowave.config;
+package org.finos.fluxnova.config;
 
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.env.PropertiesPropertySource;

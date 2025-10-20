@@ -1,4 +1,4 @@
-package org.finos.flowave;
+package org.finos.fluxnova;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
