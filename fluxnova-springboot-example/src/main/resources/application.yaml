@@ -11,7 +11,7 @@ fluxnova:
       properties:
         historyTimeToLive: P1D
     authorization:
-      enabled: true
+      enabled: false
 fluxnova.bpm.admin-user:
   id: demo
   password: demo
