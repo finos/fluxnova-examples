@@ -33,5 +33,5 @@ jobs:
         run: mvn clean deploy -f fluxnova-springboot-example/pom.xml -s fluxnova-springboot-example/settings.xml
 
       - name: Build and publish Docker image
-#        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         uses: ./.github/actions/build-publish-image
