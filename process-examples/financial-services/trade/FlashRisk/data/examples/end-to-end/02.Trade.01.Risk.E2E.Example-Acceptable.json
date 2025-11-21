@@ -1,0 +1,71 @@
+{
+  "scenarioName": "Acceptable Risk - Equity Trade",
+  "scenarioDescription": "Happy path for a standard equity trade with acceptable risk levels.",
+  "processInstanceId": "PI-20251014-A1B2C3",
+  "processStartTime": "2025-10-14T10:00:00Z",
+  "processEndTime": "2025-10-14T10:15:00Z",
+  "totalProcessDuration": 900,
+  "finalOutcome": "Acceptable",
+
+  "processInput": {
+    "tradeId": "TRADE-20251014-A1B2C3",
+    "instrument": {
+      "instrumentId": "US0378331005",
+      "instrumentType": "equity",
+      "ticker": "AAPL"
+    },
+    "quantity": 1000,
+    "price": 175.25,
+    "currency": "USD",
+    "traderId": "TRADER-007"
+  },
+
+  "taskOutputs": {
+    "specifyRiskMetrics": {
+      "taskId": "TASK-METRICS-20251014-M1N2P3",
+      "completedTimestamp": "2025-10-14T10:01:00Z",
+      "riskMetrics": [
+        { "metricName": "VaR", "parameters": { "confidenceLevel": 0.99, "timeHorizon": "1D" } },
+        { "metricName": "Greeks", "parameters": { "deltas": true, "gammas": true } }
+      ]
+    },
+    "provideMarketData": {
+      "taskId": "TASK-MD-20251014-D4E5F6",
+      "completedTimestamp": "2025-10-14T10:02:00Z",
+      "marketDataSnapshot": {
+        "timestamp": "2025-10-14T10:01:30Z",
+        "prices": { "US0378331005": 175.25 },
+        "volatilitySurfaces": { "AAPL": "surface_data_placeholder" }
+      }
+    },
+    "aggregateRiskResults": {
+      "taskId": "TASK-AGG-20251014-G7H8I9",
+      "completedTimestamp": "2025-10-14T10:12:00Z",
+      "aggregatedResults": {
+        "onPremResults": { "VaR": 120000 },
+        "cloudResults": { "delta": 0.98, "gamma": 0.05 },
+        "aggregatedMetrics": {
+          "VaR_99_1D": 120000,
+          "Delta": 0.98,
+          "Gamma": 0.05
+        }
+      }
+    },
+    "reviewResults": {
+      "taskId": "TASK-REVIEW-20251014-J1K2L3",
+      "completedTimestamp": "2025-10-14T10:14:00Z",
+      "reviewDecision": "Acceptable",
+      "reviewComments": "VaR is within limits for this trader."
+    }
+  },
+
+  "gatewayDecisions": {
+    "riskReview": {
+      "gatewayId": "Gateway_RiskDecision",
+      "evaluationTimestamp": "2025-10-14T10:14:00Z",
+      "conditionEvaluated": "${reviewDecision == 'Acceptable'}",
+      "conditionResult": true,
+      "pathTaken": "Yes -> End Event"
+    }
+  }
+}

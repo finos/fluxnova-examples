@@ -1,0 +1,212 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://finos.org/schemas/kyc/task/capture-client-data-output.schema.json",
+  "title": "Capture Client Data Task Output Schema",
+  "description": "Output from the Capture Client Data task after KYC officer has reviewed and completed the client information",
+  "type": "object",
+  "required": [
+    "taskId",
+    "applicationId",
+    "completedTimestamp",
+    "completedBy",
+    "clientId",
+    "crmRecordCreated",
+    "crmRecordId",
+    "dataQualityScore",
+    "dataCompleteness"
+  ],
+  "properties": {
+    "taskId": {
+      "type": "string",
+      "description": "Unique identifier for this task instance",
+      "pattern": "^TASK-CAPTURE-[0-9]{8}-[A-Z0-9]{6}$",
+      "examples": ["TASK-CAPTURE-20250108-C1M2N3"]
+    },
+    "applicationId": {
+      "type": "string",
+      "description": "Reference to the parent application",
+      "pattern": "^APP-[0-9]{8}-[A-Z0-9]{6}$"
+    },
+    "completedTimestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the task was completed"
+    },
+    "completedBy": {
+      "type": "string",
+      "description": "User ID of the KYC officer who completed the task",
+      "examples": ["USER-KYC-001", "USER-KYC-002"]
+    },
+    "clientId": {
+      "type": "string",
+      "description": "Newly assigned unique client identifier",
+      "pattern": "^CLI-[0-9]{8}-[0-9]{6}$",
+      "examples": ["CLI-20250108-000234"]
+    },
+    "crmRecordCreated": {
+      "type": "boolean",
+      "description": "Whether CRM record was successfully created"
+    },
+    "crmRecordId": {
+      "type": "string",
+      "description": "CRM system record identifier",
+      "examples": ["CRM-2025-0108-000234"]
+    },
+    "dataQualityScore": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Data quality score based on completeness and consistency (0-100)",
+      "examples": [98.5]
+    },
+    "dataCompleteness": {
+      "type": "string",
+      "enum": ["complete", "missing-optional-fields", "requires-follow-up"],
+      "description": "Assessment of data completeness"
+    },
+    "validatedClientData": {
+      "type": "object",
+      "description": "Validated and potentially enriched client data",
+      "properties": {
+        "clientType": {
+          "type": "string",
+          "enum": ["individual", "corporate"]
+        },
+        "basicDetails": {
+          "type": "object",
+          "description": "Core client details (structure varies by client type)"
+        },
+        "contactDetails": {
+          "type": "object",
+          "properties": {
+            "emailAddress": {
+              "type": "string",
+              "format": "email"
+            },
+            "phoneNumber": {
+              "type": "string"
+            },
+            "mobileNumber": {
+              "type": "string"
+            }
+          }
+        },
+        "address": {
+          "type": "object",
+          "properties": {
+            "addressLine1": {
+              "type": "string"
+            },
+            "city": {
+              "type": "string"
+            },
+            "postalCode": {
+              "type": "string"
+            },
+            "country": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "enrichmentData": {
+      "type": "object",
+      "description": "Additional data gathered or enriched during capture",
+      "properties": {
+        "companyHouseCheck": {
+          "type": "boolean",
+          "description": "Whether Companies House lookup was performed (for UK companies)"
+        },
+        "addressVerification": {
+          "type": "string",
+          "enum": ["verified", "not-verified", "not-applicable"],
+          "description": "Whether address was verified against postal database"
+        },
+        "duplicateCheck": {
+          "type": "object",
+          "properties": {
+            "performed": {
+              "type": "boolean"
+            },
+            "duplicatesFound": {
+              "type": "boolean"
+            },
+            "potentialMatches": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "existingClientId": {
+                    "type": "string"
+                  },
+                  "matchScore": {
+                    "type": "number"
+                  },
+                  "matchReason": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "kycOfficerNotes": {
+      "type": "string",
+      "description": "Notes from the KYC officer during data capture",
+      "maxLength": 2000
+    },
+    "flagsRaised": {
+      "type": "array",
+      "description": "Any flags or concerns raised during data capture",
+      "items": {
+        "type": "object",
+        "properties": {
+          "flagType": {
+            "type": "string",
+            "enum": [
+              "incomplete-data",
+              "inconsistent-data",
+              "duplicate-suspected",
+              "high-risk-indicator",
+              "unusual-profile",
+              "requires-senior-review"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["low", "medium", "high"]
+          }
+        }
+      }
+    },
+    "nextDocumentsRequired": {
+      "type": "array",
+      "description": "List of documents that will be required in next step",
+      "items": {
+        "type": "string",
+        "enum": [
+          "passport",
+          "driving-licence",
+          "national-id-card",
+          "proof-of-address-utility",
+          "proof-of-address-bank",
+          "articles-of-incorporation",
+          "certificate-of-incumbency",
+          "shareholder-register",
+          "beneficial-owner-documents"
+        ]
+      }
+    },
+    "processingDuration": {
+      "type": "number",
+      "description": "Time taken to complete task in seconds",
+      "minimum": 0
+    }
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "taskId": "TASK-SANC-20250108-P5L9K3",
+  "applicationId": "APP-20250108-P2Q7W9",
+  "completedTimestamp": "2025-01-08T16:52:28Z",
+  "sanctionsMatch": false,
+  "isPEP": true,
+  "overallRiskScore": 68.4,
+  "screeningResults": {
+    "sanctionsScreening": {
+      "listsScreened": [
+        "OFAC-SDN",
+        "OFAC-Consolidated",
+        "UN-Sanctions",
+        "EU-Sanctions",
+        "UK-Sanctions",
+        "HMT-Sanctions"
+      ],
+      "matches": [],
+      "totalMatches": 0
+    },
+    "pepScreening": {
+      "pepMatches": [
+        {
+          "matchId": "PEP-001",
+          "entityScreened": "Yuri Suvarov",
+          "matchedName": "SUVAROV, Yuri",
+          "matchScore": 89.6,
+          "pepType": "senior-government-official",
+          "position": "Deputy Minister of Economic Development",
+          "country": "RUS",
+          "appointmentDate": "2015-06-01",
+          "terminationDate": "2020-12-31",
+          "isCurrentlyActive": false,
+          "dateOfBirth": "1968-07-22",
+          "additionalInfo": "Former senior government official. PEP status retained for 12 months post-appointment termination per internal policy."
+        },
+        {
+          "matchId": "PEP-002",
+          "entityScreened": "Dmitry Volkov",
+          "matchedName": "VOLKOV, Dmitry",
+          "matchScore": 72.3,
+          "pepType": "close-associate",
+          "position": "Business Associate",
+          "country": "RUS",
+          "appointmentDate": "2015-01-01",
+          "isCurrentlyActive": true,
+          "dateOfBirth": "1975-02-18",
+          "additionalInfo": "Identified as close business associate of Yuri Suvarov (PEP-001). Multiple shared business interests and documented social connections."
+        }
+      ],
+      "totalPEPMatches": 2
+    },
+    "adverseMediaScreening": {
+      "adverseMediaFound": true,
+      "matches": [
+        {
+          "matchId": "MEDIA-001",
+          "entityScreened": "Yuri Suvarov",
+          "category": "corruption",
+          "severity": "medium",
+          "publicationDate": "2019-04-12",
+          "source": "Moscow Times",
+          "headline": "Questions raised over government procurement processes",
+          "summary": "Opposition politicians call for investigation into procurement irregularities in economic development ministry",
+          "url": "https://example.com/moscow-times-2019-04"
+        },
+        {
+          "matchId": "MEDIA-002",
+          "entityScreened": "Imaginary Commodities Trading DMCC",
+          "category": "regulatory-enforcement",
+          "severity": "low",
+          "publicationDate": "2023-09-22",
+          "source": "Gulf News",
+          "headline": "DMCC entity receives compliance notice",
+          "summary": "Dubai authority issues compliance improvement notice to commodities trading firm regarding record-keeping procedures",
+          "url": "https://example.com/gulf-news-2023-09"
+        }
+      ],
+      "totalMatches": 2
+    }
+  },
+  "entitiesScreened": [
+    {
+      "entityId": "APPLICANT-001",
+      "entityType": "applicant",
+      "name": "Imaginary Commodities Trading DMCC",
+      "screeningStatus": "clear"
+    },
+    {
+      "entityId": "BO-001",
+      "entityType": "beneficial-owner",
+      "name": "Dmitry Volkov",
+      "screeningStatus": "potential-match"
+    },
+    {
+      "entityId": "BO-002",
+      "entityType": "beneficial-owner",
+      "name": "Yuri Suvarov",
+      "screeningStatus": "confirmed-match"
+    }
+  ],
+  "screeningProvider": "ComplyAdvantage",
+  "processingDuration": 12.7,
+  "requiresInvestigation": true,
+  "autoScreeningDecision": "review-required"
+}

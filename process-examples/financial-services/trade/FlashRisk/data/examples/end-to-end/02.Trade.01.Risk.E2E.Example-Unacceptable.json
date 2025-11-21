@@ -1,0 +1,70 @@
+{
+  "scenarioName": "Unacceptable Risk - High Volume Derivative Trade",
+  "scenarioDescription": "Scenario for a high-volume derivative trade where the risk is deemed unacceptable.",
+  "processInstanceId": "PI-20251014-D4E5F6",
+  "processStartTime": "2025-10-14T11:00:00Z",
+  "processEndTime": "2025-10-14T11:20:00Z",
+  "totalProcessDuration": 1200,
+  "finalOutcome": "Unacceptable",
+
+  "processInput": {
+    "tradeId": "TRADE-20251014-D4E5F6",
+    "instrument": {
+      "instrumentId": "XS2443823994",
+      "instrumentType": "derivative",
+      "ticker": "VIX-FUTURE-202512"
+    },
+    "quantity": 5000,
+    "price": 25.50,
+    "currency": "USD",
+    "traderId": "TRADER-009"
+  },
+
+  "taskOutputs": {
+    "specifyRiskMetrics": {
+      "taskId": "TASK-METRICS-20251014-X1Y2Z3",
+      "completedTimestamp": "2025-10-14T11:01:00Z",
+      "riskMetrics": [
+        { "metricName": "VaR", "parameters": { "confidenceLevel": 0.99, "timeHorizon": "1D" } },
+        { "metricName": "StressTest", "parameters": { "scenario": "MARKET_CRASH_20_PERCENT" } }
+      ]
+    },
+    "provideMarketData": {
+      "taskId": "TASK-MD-20251014-A4B5C6",
+      "completedTimestamp": "2025-10-14T11:02:00Z",
+      "marketDataSnapshot": {
+        "timestamp": "2025-10-14T11:01:30Z",
+        "prices": { "XS2443823994": 25.50 },
+        "volatilitySurfaces": { "VIX-FUTURE-202512": "surface_data_placeholder" }
+      }
+    },
+    "aggregateRiskResults": {
+      "taskId": "TASK-AGG-20251014-E7F8G9",
+      "completedTimestamp": "2025-10-14T11:17:00Z",
+      "aggregatedResults": {
+        "onPremResults": { "VaR": 550000 },
+        "cloudResults": { "stressTestLoss": 1200000 },
+        "aggregatedMetrics": {
+          "VaR_99_1D": 550000,
+          "StressTest_MARKET_CRASH_20_PERCENT": 1200000
+        }
+      }
+    },
+    "reviewResults": {
+      "taskId": "TASK-REVIEW-20251014-H1I2J3",
+      "completedTimestamp": "2025-10-14T11:19:00Z",
+      "reviewDecision": "Unacceptable",
+      "reviewComments": "VaR exceeds trader's limit. Stress test loss is too high."
+    }
+  },
+
+  "gatewayDecisions": {
+    "riskReview": {
+      "gatewayId": "Gateway_RiskDecision",
+      "evaluationTimestamp": "2025-10-14T11:19:00Z",
+      "conditionEvaluated": "${reviewDecision == 'Acceptable'}",
+      "conditionResult": false,
+      "pathTaken": "No -> Escalate for amendment or cancellation"
+    }
+  }
+}

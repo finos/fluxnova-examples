@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://finos.org/schemas/common/address.schema.json",
+  "title": "Address",
+  "description": "Schema for a postal address.",
+  "type": "object",
+  "required": ["addressLine1", "city", "postalCode", "country"],
+  "properties": {
+    "addressLine1": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "description": "First line of address"
+    },
+    "addressLine2": {
+      "type": "string",
+      "maxLength": 100,
+      "description": "Second line of address"
+    },
+    "addressLine3": {
+      "type": "string",
+      "maxLength": 100,
+      "description": "Third line of address"
+    },
+    "city": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "description": "City or town"
+    },
+    "stateProvince": {
+      "type": "string",
+      "maxLength": 100,
+      "description": "State, province, or region"
+    },
+    "postalCode": {
+      "type": "string",
+      "maxLength": 20,
+      "description": "Postal or ZIP code"
+    },
+    "country": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "Country code (ISO 3166-1 alpha-3)"
+    }
+  }
+}

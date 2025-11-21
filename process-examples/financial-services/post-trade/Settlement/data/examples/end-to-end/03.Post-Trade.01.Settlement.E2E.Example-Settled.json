@@ -1,0 +1,54 @@
+{
+  "scenarioName": "Successful Equity Settlement",
+  "scenarioDescription": "Happy path for a standard equity trade that settles successfully.",
+  "processInstanceId": "PI-20251014-S1T2L3",
+  "processStartTime": "2025-10-14T14:00:00Z",
+  "processEndTime": "2025-10-16T16:00:00Z",
+  "totalProcessDuration": 172800,
+  "finalOutcome": "Settled",
+
+  "processInput": {
+    "settlementId": "SETTLE-20251014-S1T2L3",
+    "tradeId": "TRADE-20251014-A1B2C3",
+    "instrument": {
+      "instrumentId": "US0378331005",
+      "instrumentType": "equity"
+    },
+    "quantity": 1000,
+    "price": 175.25,
+    "currency": "USD",
+    "settlementDate": "2025-10-16",
+    "counterparties": [
+      { "counterpartyId": "CUST-001", "settlementInstructions": { "agent": "DTC", "account": "123456789" } },
+      { "counterpartyId": "BROKER-002", "settlementInstructions": { "agent": "Euroclear", "account": "987654321" } }
+    ]
+  },
+
+  "taskOutputs": {
+    "enrichSettlementInstructions": {
+      "taskId": "TASK-ENRICH-20251014-E1N2R3",
+      "completedTimestamp": "2025-10-14T14:05:00Z",
+      "enrichedInstructions": { "status": "Complete", "ssiFound": true }
+    },
+    "generateSettlementInstructionMessage": {
+      "taskId": "TASK-GEN-20251014-G4E5N6",
+      "completedTimestamp": "2025-10-14T14:10:00Z",
+      "instructionMessage": "<ISO20022_placeholder>...<\/ISO20022_placeholder>"
+    },
+    "monitorSettlementStatus": {
+      "taskId": "TASK-MONITOR-20251016-M7O8N9",
+      "completedTimestamp": "2025-10-16T15:55:00Z",
+      "settlementStatus": "Complete"
+    }
+  },
+
+  "gatewayDecisions": {
+    "settlementStatus": {
+      "gatewayId": "Gateway_SettlementStatus",
+      "evaluationTimestamp": "2025-10-16T15:55:00Z",
+      "conditionEvaluated": "${settlementStatus == 'Complete'}",
+      "conditionResult": true,
+      "pathTaken": "Yes -> End Event"
+    }
+  }
+}

@@ -1,0 +1,313 @@
+{
+  "metadata": {
+    "lastUpdated": "2025-01-08",
+    "version": "1.0",
+    "description": "Valid document types for KYC verification by client type"
+  },
+  "individualDocuments": {
+    "identityDocuments": [
+      {
+        "documentType": "passport",
+        "displayName": "Passport",
+        "category": "primary-identity",
+        "acceptedFrom": "all-countries",
+        "validityRequirement": "must-not-be-expired",
+        "verificationMethods": ["ocr", "biometric-match", "chip-verification"],
+        "requiredFields": [
+          "fullName",
+          "dateOfBirth",
+          "nationality",
+          "passportNumber",
+          "issueDate",
+          "expiryDate",
+          "photograph"
+        ],
+        "notes": "Preferred identity document. Must show clear photograph and be in date."
+      },
+      {
+        "documentType": "driving-licence",
+        "displayName": "Driving Licence",
+        "category": "primary-identity",
+        "acceptedFrom": ["GBR", "USA", "CAN", "AUS", "EU-members"],
+        "validityRequirement": "must-not-be-expired",
+        "verificationMethods": ["ocr", "photograph-verification"],
+        "requiredFields": [
+          "fullName",
+          "dateOfBirth",
+          "licenceNumber",
+          "issueDate",
+          "expiryDate",
+          "photograph",
+          "address"
+        ],
+        "notes": "Acceptable from specified jurisdictions only. Photocard required."
+      },
+      {
+        "documentType": "national-id-card",
+        "displayName": "National Identity Card",
+        "category": "primary-identity",
+        "acceptedFrom": ["EU-members", "CHE", "NOR", "ISL"],
+        "validityRequirement": "must-not-be-expired",
+        "verificationMethods": ["ocr", "biometric-match", "chip-verification"],
+        "requiredFields": [
+          "fullName",
+          "dateOfBirth",
+          "nationality",
+          "idNumber",
+          "issueDate",
+          "expiryDate",
+          "photograph"
+        ],
+        "notes": "Acceptable from countries that issue government ID cards"
+      }
+    ],
+    "proofOfAddress": [
+      {
+        "documentType": "proof-of-address-utility",
+        "displayName": "Utility Bill",
+        "category": "address-verification",
+        "acceptedProviders": ["electricity", "gas", "water", "landline-phone"],
+        "validityRequirement": "within-3-months",
+        "verificationMethods": ["ocr", "provider-verification"],
+        "requiredFields": [
+          "fullName",
+          "address",
+          "billDate",
+          "providerName",
+          "accountNumber"
+        ],
+        "notes": "Must be from recognised utility provider. Mobile phone bills not accepted."
+      },
+      {
+        "documentType": "proof-of-address-bank",
+        "displayName": "Bank Statement",
+        "category": "address-verification",
+        "acceptedProviders": ["regulated-banks", "building-societies"],
+        "validityRequirement": "within-3-months",
+        "verificationMethods": ["ocr", "institution-verification"],
+        "requiredFields": [
+          "fullName",
+          "address",
+          "statementDate",
+          "bankName",
+          "accountNumber"
+        ],
+        "notes": "Must be from regulated financial institution. Can be electronic with digital signature."
+      },
+      {
+        "documentType": "proof-of-address-tax",
+        "displayName": "Tax Assessment",
+        "category": "address-verification",
+        "acceptedProviders": ["government-tax-authorities"],
+        "validityRequirement": "current-tax-year",
+        "verificationMethods": ["ocr", "authority-verification"],
+        "requiredFields": [
+          "fullName",
+          "address",
+          "taxYear",
+          "authorityName",
+          "referenceNumber"
+        ],
+        "notes": "Government tax documents are high-quality proof of address"
+      },
+      {
+        "documentType": "proof-of-address-tenancy",
+        "displayName": "Tenancy Agreement",
+        "category": "address-verification",
+        "acceptedProviders": ["letting-agents", "landlords"],
+        "validityRequirement": "current-and-signed",
+        "verificationMethods": ["document-verification"],
+        "requiredFields": [
+          "tenantName",
+          "address",
+          "commencementDate",
+          "landlordDetails",
+          "signatures"
+        ],
+        "notes": "Must be properly executed tenancy agreement. May require landlord verification."
+      }
+    ]
+  },
+  "corporateDocuments": {
+    "entityVerification": [
+      {
+        "documentType": "articles-of-incorporation",
+        "displayName": "Articles of Incorporation / Certificate of Incorporation",
+        "category": "entity-formation",
+        "mandatory": true,
+        "acceptedFrom": "all-countries",
+        "validityRequirement": "certified-copy",
+        "verificationMethods": ["registry-verification", "apostille-check"],
+        "requiredFields": [
+          "companyName",
+          "registrationNumber",
+          "incorporationDate",
+          "jurisdiction",
+          "registrarSeal"
+        ],
+        "notes": "Must be certified copy from companies registry or equivalent authority"
+      },
+      {
+        "documentType": "certificate-of-incumbency",
+        "displayName": "Certificate of Incumbency / Good Standing",
+        "category": "entity-status",
+        "mandatory": true,
+        "acceptedFrom": "all-countries",
+        "validityRequirement": "within-3-months",
+        "verificationMethods": ["registry-verification"],
+        "requiredFields": [
+          "companyName",
+          "registrationNumber",
+          "directors",
+          "issueDate",
+          "registrarSeal"
+        ],
+        "notes": "Confirms current directors and company good standing. Must be recent."
+      },
+      {
+        "documentType": "memorandum-of-association",
+        "displayName": "Memorandum and Articles of Association",
+        "category": "governing-documents",
+        "mandatory": "if-applicable",
+        "acceptedFrom": "all-countries",
+        "validityRequirement": "current-version",
+        "verificationMethods": ["document-verification"],
+        "requiredFields": [
+          "companyName",
+          "objectsClause",
+          "shareStructure",
+          "governanceRules"
+        ],
+        "notes": "Required for understanding company structure and powers"
+      },
+      {
+        "documentType": "shareholder-register",
+        "displayName": "Register of Shareholders / Members",
+        "category": "ownership-structure",
+        "mandatory": true,
+        "acceptedFrom": "all-countries",
+        "validityRequirement": "within-1-month",
+        "verificationMethods": ["document-verification", "cross-reference"],
+        "requiredFields": [
+          "shareholderNames",
+          "shareQuantities",
+          "sharePercentages",
+          "issueDate"
+        ],
+        "notes": "Must show beneficial owners with >25% ownership. Must be current."
+      },
+      {
+        "documentType": "proof-of-address-commercial",
+        "displayName": "Proof of Business Address",
+        "category": "address-verification",
+        "mandatory": true,
+        "acceptedFrom": "all-countries",
+        "validityRequirement": "within-3-months",
+        "verificationMethods": ["ocr", "verification"],
+        "requiredFields": [
+          "companyName",
+          "address",
+          "documentDate"
+        ],
+        "acceptedDocuments": [
+          "commercial-lease",
+          "utility-bill",
+          "bank-statement",
+          "tax-notice"
+        ],
+        "notes": "Must clearly show company name and registered/trading address"
+      },
+      {
+        "documentType": "board-resolution",
+        "displayName": "Board Resolution for Account Opening",
+        "category": "authorisation",
+        "mandatory": true,
+        "acceptedFrom": "all-countries",
+        "validityRequirement": "specifically-for-application",
+        "verificationMethods": ["document-verification"],
+        "requiredFields": [
+          "resolutionDate",
+          "authorisedSignatories",
+          "accountOpeningApproval",
+          "directorSignatures"
+        ],
+        "notes": "Must specifically authorise account opening and name authorised signatories"
+      },
+      {
+        "documentType": "financial-statements",
+        "displayName": "Audited Financial Statements",
+        "category": "financial-verification",
+        "mandatory": "for-high-risk",
+        "acceptedFrom": "all-countries",
+        "validityRequirement": "most-recent-year",
+        "verificationMethods": ["auditor-verification"],
+        "requiredFields": [
+          "companyName",
+          "financialYear",
+          "auditorName",
+          "auditorSignature"
+        ],
+        "notes": "Required for high-risk entities or those with significant trading volumes"
+      },
+      {
+        "documentType": "licence-certificate",
+        "displayName": "Regulatory Licence / Certificate",
+        "category": "regulatory-status",
+        "mandatory": "if-regulated",
+        "acceptedFrom": "all-countries",
+        "validityRequirement": "must-not-be-expired",
+        "verificationMethods": ["regulator-verification"],
+        "requiredFields": [
+          "companyName",
+          "licenceNumber",
+          "regulatorName",
+          "issueDate",
+          "expiryDate"
+        ],
+        "notes": "Required if entity is regulated (e.g., financial services, gaming). Must verify with regulator."
+      }
+    ],
+    "beneficialOwnerDocuments": [
+      {
+        "documentType": "beneficial-owner-passport",
+        "displayName": "Beneficial Owner Passport",
+        "category": "beneficial-owner-identity",
+        "mandatory": "for-each-bo",
+        "validityRequirement": "must-not-be-expired",
+        "notes": "Required for each beneficial owner with >25% ownership"
+      },
+      {
+        "documentType": "beneficial-owner-address",
+        "displayName": "Beneficial Owner Proof of Address",
+        "category": "beneficial-owner-address",
+        "mandatory": "for-each-bo",
+        "validityRequirement": "within-3-months",
+        "notes": "Required for each beneficial owner with >25% ownership"
+      }
+    ]
+  },
+  "documentQualityStandards": {
+    "fileFormats": {
+      "accepted": ["pdf", "jpg", "jpeg", "png"],
+      "preferred": "pdf",
+      "notes": "Original scans preferred over photographs"
+    },
+    "imageQuality": {
+      "minimumResolution": "300dpi",
+      "colourMode": "colour-preferred",
+      "clarity": "all-text-readable",
+      "completeness": "all-pages-required"
+    },
+    "prohibitedFormats": {
+      "notAccepted": ["photocopies-of-photocopies", "screenshots", "heavily-edited-images"],
+      "notes": "Documents must be clear, unaltered original scans or photographs"
+    }
+  },
+  "validityPeriods": {
+    "identity-documents": "must-be-current",
+    "proof-of-address": "within-3-months",
+    "corporate-registry-documents": "within-3-months",
+    "financial-statements": "most-recent-audited-year",
+    "board-resolutions": "specific-to-this-application"
+  }
+}

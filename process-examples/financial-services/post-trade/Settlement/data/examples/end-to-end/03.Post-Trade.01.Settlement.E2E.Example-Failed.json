@@ -1,0 +1,62 @@
+{
+  "scenarioName": "Failed Settlement - Insufficient Funds",
+  "scenarioDescription": "Scenario for a trade that fails to settle due to insufficient funds.",
+  "processInstanceId": "PI-20251014-F4I5L6",
+  "processStartTime": "2025-10-15T09:00:00Z",
+  "processEndTime": "2025-10-17T17:00:00Z",
+  "totalProcessDuration": 288000,
+  "finalOutcome": "Failed",
+
+  "processInput": {
+    "settlementId": "SETTLE-20251015-F4I5L6",
+    "tradeId": "TRADE-20251015-B2C3D4",
+    "instrument": {
+      "instrumentId": "XS1234567890",
+      "instrumentType": "bond"
+    },
+    "quantity": 100000,
+    "price": 101.50,
+    "currency": "EUR",
+    "settlementDate": "2025-10-17",
+    "counterparties": [
+      { "counterpartyId": "CUST-002", "settlementInstructions": { "agent": "Clearstream", "account": "234567890" } },
+      { "counterpartyId": "BROKER-003", "settlementInstructions": { "agent": "Euroclear", "account": "876543210" } }
+    ]
+  },
+
+  "taskOutputs": {
+    "enrichSettlementInstructions": {
+      "taskId": "TASK-ENRICH-20251015-A1B2C3",
+      "completedTimestamp": "2025-10-15T09:05:00Z",
+      "enrichedInstructions": { "status": "Complete", "ssiFound": true }
+    },
+    "generateSettlementInstructionMessage": {
+      "taskId": "TASK-GEN-20251015-D4E5F6",
+      "completedTimestamp": "2025-10-15T09:10:00Z",
+      "instructionMessage": "<ISO20022_placeholder>...<\/ISO20022_placeholder>"
+    },
+    "monitorSettlementStatus": {
+      "taskId": "TASK-MONITOR-20251017-G7H8I9",
+      "completedTimestamp": "2025-10-17T16:00:00Z",
+      "settlementStatus": "Failed"
+    },
+    "failResolution": {
+      "taskId": "TASK-FAIL-20251017-J1K2L3",
+      "completedTimestamp": "2025-10-17T16:30:00Z",
+      "resolution": {
+        "reason": "Insufficient funds at counterparty BROKER-003",
+        "resolutionAction": "Contacted counterparty, awaiting funding. Will retry tomorrow."
+      }
+    }
+  },
+
+  "gatewayDecisions": {
+    "settlementStatus": {
+      "gatewayId": "Gateway_SettlementStatus",
+      "evaluationTimestamp": "2025-10-17T16:00:00Z",
+      "conditionEvaluated": "${settlementStatus == 'Complete'}",
+      "conditionResult": false,
+      "pathTaken": "No -> Fail Resolution"
+    }
+  }
+}

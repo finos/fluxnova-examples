@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+    xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_SpeculativeRisk"
+    targetNamespace="http://camunda.org/speculative/risk" exporter="Camunda Modeler"
+    exporterVersion="5.39.0">
+    <bpmn:process id="Process_SpeculativeRisk" name="Speculative Risk Calculation"
+        isExecutable="true">
+        <bpmn:startEvent id="StartEvent_TradeCaptured" name="Trade Captured">
+            <bpmn:outgoing>Flow_0p1k1at</bpmn:outgoing>
+        </bpmn:startEvent>
+        <bpmn:userTask id="Task_SpecifyRiskMetrics" name="Specify Risk Metrics"
+            camunda:assignee="risk-dept">
+            <bpmn:incoming>Flow_0lv50d1</bpmn:incoming>
+            <bpmn:outgoing>Flow_1m5pqhl</bpmn:outgoing>
+        </bpmn:userTask>
+        <bpmn:userTask id="Task_ProvideMarketData" name="Provide Market Data Snapshot"
+            camunda:assignee="middle-office">
+            <bpmn:incoming>Flow_1i10yrd</bpmn:incoming>
+        </bpmn:userTask>
+        <bpmn:parallelGateway id="Gateway_ForkCompute">
+            <bpmn:incoming>Flow_1m5pqhl</bpmn:incoming>
+        </bpmn:parallelGateway>
+        <bpmn:serviceTask id="Task_OnPremRiskJobs" name="Run On-Prem Risk Jobs"
+            camunda:type="external" camunda:topic="onprem-risk" />
+        <bpmn:serviceTask id="Task_ProvisionCloud" name="Provision Cloud Engine"
+            camunda:type="external" camunda:topic="cloud-provision" />
+        <bpmn:serviceTask id="Task_RunCloudRiskJobs" name="Run Cloud Risk Jobs"
+            camunda:type="external" camunda:topic="cloud-risk" />
+        <bpmn:serviceTask id="Task_TearDownCloud" name="Tear Down Cloud Engine"
+            camunda:type="external" camunda:topic="cloud-teardown" />
+        <bpmn:parallelGateway id="Gateway_JoinCompute" />
+        <bpmn:serviceTask id="Task_AggregateResults" name="Aggregate Risk Results"
+            camunda:type="external" camunda:topic="aggregate" />
+        <bpmn:userTask id="Task_ReviewResults" name="Review Results" camunda:assignee="risk-dept" />
+        <bpmn:exclusiveGateway id="Gateway_RiskDecision" />
+        <bpmn:endEvent id="EndEvent_Accept" name="Risk Acceptable">
+            <bpmn:terminateEventDefinition />
+        </bpmn:endEvent>
+        <bpmn:endEvent id="EndEvent_Escalate" name="Risk Unacceptable">
+            <bpmn:terminateEventDefinition />
+        </bpmn:endEvent>
+        <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_ProvideMarketData"
+            targetRef="Gateway_ForkCompute" />
+        <bpmn:sequenceFlow id="Flow_4a" sourceRef="Gateway_ForkCompute"
+            targetRef="Task_OnPremRiskJobs" />
+        <bpmn:sequenceFlow id="Flow_4b" sourceRef="Gateway_ForkCompute"
+            targetRef="Task_ProvisionCloud" />
+        <bpmn:sequenceFlow id="Flow_4c" sourceRef="Task_ProvisionCloud"
+            targetRef="Task_RunCloudRiskJobs" />
+        <bpmn:sequenceFlow id="Flow_4d" sourceRef="Task_RunCloudRiskJobs"
+            targetRef="Task_TearDownCloud" />
+        <bpmn:sequenceFlow id="Flow_4e" sourceRef="Task_TearDownCloud"
+            targetRef="Gateway_JoinCompute" />
+        <bpmn:sequenceFlow id="Flow_4f" sourceRef="Task_OnPremRiskJobs"
+            targetRef="Gateway_JoinCompute" />
+        <bpmn:sequenceFlow id="Flow_5" sourceRef="Gateway_JoinCompute"
+            targetRef="Task_AggregateResults" />
+        <bpmn:sequenceFlow id="Flow_6" sourceRef="Task_AggregateResults"
+            targetRef="Task_ReviewResults" />
+        <bpmn:sequenceFlow id="Flow_7" sourceRef="Task_ReviewResults"
+            targetRef="Gateway_RiskDecision" />
+        <bpmn:sequenceFlow id="Flow_8_accept" sourceRef="Gateway_RiskDecision"
+            targetRef="EndEvent_Accept">
+            <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${riskAcceptable}</bpmn:conditionExpression>
+        </bpmn:sequenceFlow>
+        <bpmn:sequenceFlow id="Flow_8_reject" sourceRef="Gateway_RiskDecision"
+            targetRef="EndEvent_Escalate">
+            <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${riskAcceptable == false}</bpmn:conditionExpression>
+        </bpmn:sequenceFlow>
+        <bpmn:parallelGateway id="Gateway_14exyfl">
+            <bpmn:incoming>Flow_0p1k1at</bpmn:incoming>
+            <bpmn:outgoing>Flow_0lv50d1</bpmn:outgoing>
+            <bpmn:outgoing>Flow_1i10yrd</bpmn:outgoing>
+        </bpmn:parallelGateway>
+        <bpmn:sequenceFlow id="Flow_0p1k1at" sourceRef="StartEvent_TradeCaptured"
+            targetRef="Gateway_14exyfl" />
+        <bpmn:sequenceFlow id="Flow_0lv50d1" sourceRef="Gateway_14exyfl"
+            targetRef="Task_SpecifyRiskMetrics" />
+        <bpmn:sequenceFlow id="Flow_1i10yrd" sourceRef="Gateway_14exyfl"
+            targetRef="Task_ProvideMarketData" />
+        <bpmn:sequenceFlow id="Flow_1m5pqhl" sourceRef="Task_SpecifyRiskMetrics"
+            targetRef="Gateway_ForkCompute" />
+    </bpmn:process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_SpeculativeRisk">
+        <bpmndi:BPMNPlane id="BPMNPlane_SpeculativeRisk" bpmnElement="Process_SpeculativeRisk">
+            <bpmndi:BPMNShape id="Shape_Task_MarketData" bpmnElement="Task_ProvideMarketData">
+                <dc:Bounds x="430" y="260" width="140" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_Task_Specify" bpmnElement="Task_SpecifyRiskMetrics">
+                <dc:Bounds x="440" y="120" width="120" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_Gateway_Fork" bpmnElement="Gateway_ForkCompute"
+                isMarkerVisible="true">
+                <dc:Bounds x="790" y="195" width="50" height="50" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="603" y="245" width="85" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_Task_OnPrem" bpmnElement="Task_OnPremRiskJobs">
+                <dc:Bounds x="930" y="80" width="140" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_Task_Provision" bpmnElement="Task_ProvisionCloud">
+                <dc:Bounds x="930" y="260" width="160" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_Task_RunCloud" bpmnElement="Task_RunCloudRiskJobs">
+                <dc:Bounds x="930" y="380" width="160" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_Task_TearDown" bpmnElement="Task_TearDownCloud">
+                <dc:Bounds x="930" y="500" width="160" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_Gateway_Join" bpmnElement="Gateway_JoinCompute"
+                isMarkerVisible="true">
+                <dc:Bounds x="1150" y="195" width="50" height="50" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_Task_Aggregate" bpmnElement="Task_AggregateResults">
+                <dc:Bounds x="1250" y="180" width="160" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_Task_Review" bpmnElement="Task_ReviewResults">
+                <dc:Bounds x="1470" y="180" width="140" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_Gateway_Decision" bpmnElement="Gateway_RiskDecision"
+                isMarkerVisible="true">
+                <dc:Bounds x="1630" y="195" width="50" height="50" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_End_Accept" bpmnElement="EndEvent_Accept">
+                <dc:Bounds x="1832" y="122" width="36" height="36" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="1810" y="173" width="79" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_End_Escalate" bpmnElement="EndEvent_Escalate">
+                <dc:Bounds x="1832" y="282" width="36" height="36" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="1816" y="326" width="68" height="27" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Gateway_14exyfl_di" bpmnElement="Gateway_14exyfl">
+                <dc:Bounds x="295" y="195" width="50" height="50" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Shape_StartEvent" bpmnElement="StartEvent_TradeCaptured">
+                <dc:Bounds x="172" y="202" width="36" height="36" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="152" y="238" width="76" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="Edge_Flow_3" bpmnElement="Flow_3">
+                <di:waypoint x="570" y="300" />
+                <di:waypoint x="700" y="300" />
+                <di:waypoint x="700" y="220" />
+                <di:waypoint x="790" y="220" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Edge_Flow_4a" bpmnElement="Flow_4a">
+                <di:waypoint x="815" y="195" />
+                <di:waypoint x="815" y="120" />
+                <di:waypoint x="930" y="120" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Edge_Flow_4b" bpmnElement="Flow_4b">
+                <di:waypoint x="815" y="245" />
+                <di:waypoint x="815" y="300" />
+                <di:waypoint x="930" y="300" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Edge_Flow_4c" bpmnElement="Flow_4c">
+                <di:waypoint x="1010" y="340" />
+                <di:waypoint x="1010" y="380" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Edge_Flow_4d" bpmnElement="Flow_4d">
+                <di:waypoint x="1010" y="460" />
+                <di:waypoint x="1010" y="500" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Edge_Flow_4e" bpmnElement="Flow_4e">
+                <di:waypoint x="1090" y="540" />
+                <di:waypoint x="1175" y="540" />
+                <di:waypoint x="1175" y="245" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Edge_Flow_4f" bpmnElement="Flow_4f">
+                <di:waypoint x="1070" y="120" />
+                <di:waypoint x="1175" y="120" />
+                <di:waypoint x="1175" y="195" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Edge_Flow_5" bpmnElement="Flow_5">
+                <di:waypoint x="1200" y="220" />
+                <di:waypoint x="1250" y="220" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Edge_Flow_6" bpmnElement="Flow_6">
+                <di:waypoint x="1410" y="220" />
+                <di:waypoint x="1470" y="220" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Edge_Flow_7" bpmnElement="Flow_7">
+                <di:waypoint x="1610" y="220" />
+                <di:waypoint x="1630" y="220" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Edge_Flow_8_accept" bpmnElement="Flow_8_accept">
+                <di:waypoint x="1655" y="195" />
+                <di:waypoint x="1655" y="140" />
+                <di:waypoint x="1832" y="140" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="1461" y="158" width="78" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Edge_Flow_8_reject" bpmnElement="Flow_8_reject">
+                <di:waypoint x="1655" y="245" />
+                <di:waypoint x="1655" y="300" />
+                <di:waypoint x="1832" y="300" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_0p1k1at_di" bpmnElement="Flow_0p1k1at">
+                <di:waypoint x="208" y="220" />
+                <di:waypoint x="295" y="220" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_0lv50d1_di" bpmnElement="Flow_0lv50d1">
+                <di:waypoint x="320" y="195" />
+                <di:waypoint x="320" y="160" />
+                <di:waypoint x="440" y="160" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_1i10yrd_di" bpmnElement="Flow_1i10yrd">
+                <di:waypoint x="320" y="245" />
+                <di:waypoint x="320" y="300" />
+                <di:waypoint x="430" y="300" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_1m5pqhl_di" bpmnElement="Flow_1m5pqhl">
+                <di:waypoint x="560" y="160" />
+                <di:waypoint x="700" y="160" />
+                <di:waypoint x="700" y="220" />
+                <di:waypoint x="790" y="220" />
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</bpmn:definitions>

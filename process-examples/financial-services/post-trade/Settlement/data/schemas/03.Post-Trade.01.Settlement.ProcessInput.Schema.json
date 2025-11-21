@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://finos.org/schemas/post-trade/settlement/process-input.schema.json",
+  "title": "Settlement Process Input Schema",
+  "description": "Schema for data required to initiate the Trade Settlement workflow",
+  "type": "object",
+  "required": [
+    "settlementId",
+    "tradeId",
+    "instrument",
+    "quantity",
+    "price",
+    "currency",
+    "settlementDate",
+    "counterparties"
+  ],
+  "properties": {
+    "settlementId": {
+      "type": "string",
+      "description": "Unique identifier for the settlement instruction.",
+      "pattern": "^SETTLE-[0-9]{8}-[A-Z0-9]{6}$"
+    },
+    "tradeId": {
+      "type": "string",
+      "description": "The ID of the trade to be settled.",
+      "pattern": "^TRADE-[0-9]{8}-[A-Z0-9]{6}$"
+    },
+    "instrument": {
+      "type": "object",
+      "description": "Details of the financial instrument being settled.",
+      "required": ["instrumentId", "instrumentType"],
+      "properties": {
+        "instrumentId": {
+          "type": "string",
+          "description": "Unique identifier for the instrument (e.g., ISIN, CUSIP)."
+        },
+        "instrumentType": {
+          "type": "string",
+          "enum": ["equity", "bond", "derivative"]
+        }
+      }
+    },
+    "quantity": {
+      "type": "number",
+      "description": "The quantity of the instrument to be settled."
+    },
+    "price": {
+      "type": "number",
+      "description": "The settlement price."
+    },
+    "currency": {
+      "type": "string",
+      "description": "The settlement currency.",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "settlementDate": {
+      "type": "string",
+      "format": "date",
+      "description": "The intended settlement date."
+    },
+    "counterparties": {
+      "type": "array",
+      "description": "The counterparties involved in the settlement.",
+      "items": {
+        "type": "object",
+        "required": ["counterpartyId", "settlementInstructions"],
+        "properties": {
+          "counterpartyId": {
+            "type": "string",
+            "description": "The ID of the counterparty."
+          },
+          "settlementInstructions": {
+            "type": "object",
+            "description": "The settlement instructions for the counterparty."
+          }
+        }
+      }
+    }
+  }
+}

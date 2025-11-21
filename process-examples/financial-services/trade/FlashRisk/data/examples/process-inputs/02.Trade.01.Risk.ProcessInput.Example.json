@@ -1,0 +1,12 @@
+{
+  "tradeId": "TRADE-20251014-A1B2C3",
+  "instrument": {
+    "instrumentId": "US0378331005",
+    "instrumentType": "equity",
+    "ticker": "AAPL"
+  },
+  "quantity": 1000,
+  "price": 175.25,
+  "currency": "USD",
+  "traderId": "TRADER-007"
+}

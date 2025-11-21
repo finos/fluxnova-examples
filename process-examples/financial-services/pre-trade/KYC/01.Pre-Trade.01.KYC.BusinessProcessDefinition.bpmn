@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" targetNamespace="http://example.com/bpmn/client-onboarding-kyc" exporter="Camunda Modeler" exporterVersion="5.39.0">
+  <process id="Process_ClientOnboardingKYC" name="Client Onboarding &#38; KYC (Pre-Trade)" isExecutable="true">
+    <subProcess id="EventSubProcess_SLA" name="Process SLA (PT120H)" triggeredByEvent="true">
+      <startEvent id="StartEvent_ProcessSLA" name="Process SLA Timer" isInterrupting="false">
+        <timerEventDefinition>
+          <timeDuration xsi:type="tFormalExpression">PT120H</timeDuration>
+        </timerEventDefinition>
+      </startEvent>
+      <sequenceFlow id="Flow_SLA_Start_To_Escalate" sourceRef="StartEvent_ProcessSLA" targetRef="ServiceTask_SLAEscalation_SeniorMgmt" />
+      <serviceTask id="ServiceTask_SLAEscalation_SeniorMgmt" name="Escalate to Senior Management" camunda:type="external" camunda:topic="sla-escalation" />
+      <sequenceFlow id="Flow_SLA_Escalate_To_Audit" sourceRef="ServiceTask_SLAEscalation_SeniorMgmt" targetRef="ServiceTask_MarkCaseForAudit" />
+      <serviceTask id="ServiceTask_MarkCaseForAudit" name="Mark Case for Audit" camunda:type="external" camunda:topic="mark-for-audit" />
+      <sequenceFlow id="Flow_SLA_Audit_To_End" sourceRef="ServiceTask_MarkCaseForAudit" targetRef="EndEvent_SLAHandled" />
+      <endEvent id="EndEvent_SLAHandled" name="SLA Handling Complete" />
+    </subProcess>
+    <startEvent id="StartEvent_ApplicationSubmitted" name="Application Submitted" />
+    <sequenceFlow id="Flow_Start_To_Capture" sourceRef="StartEvent_ApplicationSubmitted" targetRef="UserTask_CaptureClientData" />
+    <userTask id="UserTask_CaptureClientData" name="Capture Client Data" />
+    <sequenceFlow id="Flow_Capture_To_Persist" sourceRef="UserTask_CaptureClientData" targetRef="ServiceTask_PersistClientData" />
+    <serviceTask id="ServiceTask_PersistClientData" name="Persist Client Data" camunda:type="external" camunda:topic="crm-sync" />
+    <sequenceFlow id="Flow_Persist_To_CollectDocs" sourceRef="ServiceTask_PersistClientData" targetRef="UserTask_UploadDocuments" />
+    <userTask id="UserTask_UploadDocuments" name="Upload Documents &#38; References" />
+    <sequenceFlow id="Flow_CollectDocs_To_StoreDocs" sourceRef="UserTask_UploadDocuments" targetRef="ServiceTask_StoreDocuments" />
+    <serviceTask id="ServiceTask_StoreDocuments" name="Store Documents &#38; References" camunda:type="external" camunda:topic="document-management" />
+    <sequenceFlow id="Flow_StoreDocs_To_VerifyDocs" sourceRef="ServiceTask_StoreDocuments" targetRef="ServiceTask_VerifyDocuments" />
+    <serviceTask id="ServiceTask_VerifyDocuments" name="Verify Documents (OCR/Biometrics/IDV)" camunda:type="external" camunda:topic="doc-verification" />
+    <boundaryEvent id="BoundaryTimer_VerifyDocs" name="48h SLA" cancelActivity="false" attachedToRef="ServiceTask_VerifyDocuments">
+      <timerEventDefinition>
+        <timeDuration xsi:type="tFormalExpression">PT48H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="Flow_Boundary_Verify_To_EscalateOps" sourceRef="BoundaryTimer_VerifyDocs" targetRef="ServiceTask_EscalateOps_VerificationSLA" />
+    <serviceTask id="ServiceTask_EscalateOps_VerificationSLA" name="Escalate to Ops Manager (Verification SLA Breach)" camunda:type="external" camunda:topic="ops-escalation" />
+    <sequenceFlow id="Flow_VerifyDocs_To_GwDocs" sourceRef="ServiceTask_VerifyDocuments" targetRef="Gateway_DocumentsVerified" />
+    <exclusiveGateway id="Gateway_DocumentsVerified" name="Documents Verified?" />
+    <sequenceFlow id="Flow_GwDocs_To_Sanctions" name="Yes" sourceRef="Gateway_DocumentsVerified" targetRef="ServiceTask_SanctionsPEP">
+      <conditionExpression xsi:type="tFormalExpression">${documentsVerified == true}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_GwDocs_To_Repair" name="No" sourceRef="Gateway_DocumentsVerified" targetRef="UserTask_OpsRemediation">
+      <conditionExpression xsi:type="tFormalExpression">${!documentsVerified}</conditionExpression>
+    </sequenceFlow>
+    <userTask id="UserTask_OpsRemediation" name="Ops Remediation (Correct Data / Re-request Docs)">
+      <incoming>Flow_1srkuh4</incoming>
+      <outgoing>Flow_0y9ulo7</outgoing>
+      <outgoing>Flow_1431pu5</outgoing>
+    </userTask>
+    <serviceTask id="ServiceTask_SanctionsPEP" name="Sanctions &#38; PEP Screening" camunda:type="external" camunda:topic="sanctions-screen" />
+    <sequenceFlow id="Flow_Sanctions_To_GwSanctions" sourceRef="ServiceTask_SanctionsPEP" targetRef="Gateway_SanctionsDecision" />
+    <exclusiveGateway id="Gateway_SanctionsDecision" name="Sanctions Match?" />
+    <sequenceFlow id="Flow_GwSanctions_To_Investigation" name="Yes" sourceRef="Gateway_SanctionsDecision" targetRef="UserTask_ComplianceInvestigation_Sanctions">
+      <conditionExpression xsi:type="tFormalExpression">${sanctionsMatch == true}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_GwSanctions_To_Risk" name="No" sourceRef="Gateway_SanctionsDecision" targetRef="BusinessRule_RiskAssessment">
+      <conditionExpression xsi:type="tFormalExpression">${!sanctionsMatch}</conditionExpression>
+    </sequenceFlow>
+    <userTask id="UserTask_ComplianceInvestigation_Sanctions" name="Compliance Investigation (Sanctions Hit)"/>
+    <sequenceFlow id="Flow_Investigation_To_GwOutcome" sourceRef="UserTask_ComplianceInvestigation_Sanctions" targetRef="Gateway_SanctionsOutcome" />
+    <exclusiveGateway id="Gateway_SanctionsOutcome" name="Sanctions Cleared?" />
+    <sequenceFlow id="Flow_GwOutcome_To_Risk" name="Yes" sourceRef="Gateway_SanctionsOutcome" targetRef="BusinessRule_RiskAssessment">
+      <conditionExpression xsi:type="tFormalExpression">${sanctionsCleared == true}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_GwOutcome_To_EndRejected" name="No" sourceRef="Gateway_SanctionsOutcome" targetRef="EndEvent_Rejected">
+      <conditionExpression xsi:type="tFormalExpression">${!sanctionsCleared}</conditionExpression>
+    </sequenceFlow>
+    <businessRuleTask id="BusinessRule_RiskAssessment" name="AML/KYC Risk Scoring (DMN)" camunda:resultVariable="riskCategory" camunda:decisionRef="RiskAssessment" camunda:mapDecisionResult="singleEntry" />
+    <boundaryEvent id="BoundaryTimer_RiskAssessment" name="24h SLA" cancelActivity="false" attachedToRef="BusinessRule_RiskAssessment">
+      <timerEventDefinition>
+        <timeDuration xsi:type="tFormalExpression">PT24H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="Flow_Boundary_Risk_To_EscalateCompliance" sourceRef="BoundaryTimer_RiskAssessment" targetRef="ServiceTask_EscalateCompliance_RiskSLA" />
+    <serviceTask id="ServiceTask_EscalateCompliance_RiskSLA" name="Escalate to Compliance Manager (Risk Assessment SLA)" camunda:type="external" camunda:topic="compliance-escalation" />
+    <sequenceFlow id="Flow_Risk_To_GwRiskCategory" sourceRef="BusinessRule_RiskAssessment" targetRef="Gateway_RiskCategory" />
+    <exclusiveGateway id="Gateway_RiskCategory" name="Risk Category Decision">
+      <outgoing>Flow_GwRisk_To_AccountOpening</outgoing>
+    </exclusiveGateway>
+    <sequenceFlow id="Flow_GwRisk_To_ComplianceReview" name="Medium" sourceRef="Gateway_RiskCategory" targetRef="UserTask_ComplianceReview">
+      <conditionExpression xsi:type="tFormalExpression">${riskCategory == 'Medium'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_GwRisk_To_EDD" name="High" sourceRef="Gateway_RiskCategory" targetRef="UserTask_EnhancedDueDiligence">
+      <conditionExpression xsi:type="tFormalExpression">${riskCategory == 'High'}</conditionExpression>
+    </sequenceFlow>
+    <userTask id="UserTask_EnhancedDueDiligence" name="Enhanced Due Diligence (Senior Compliance)"/>
+    <sequenceFlow id="Flow_EDD_To_ComplianceReview" sourceRef="UserTask_EnhancedDueDiligence" targetRef="Gateway_ComplianceDecision" />
+    <userTask id="UserTask_ComplianceReview" name="Compliance Review" />
+    <sequenceFlow id="Flow_ComplianceReview_To_GwDecision" sourceRef="UserTask_ComplianceReview" targetRef="Gateway_ComplianceDecision" />
+    <exclusiveGateway id="Gateway_ComplianceDecision" name="Approval Decision">
+      <outgoing>Flow_GwDecision_To_AccountOpening</outgoing>
+    </exclusiveGateway>
+    <sequenceFlow id="Flow_GwDecision_To_EndRejected" name="Rejected" sourceRef="Gateway_ComplianceDecision" targetRef="EndEvent_Rejected">
+      <conditionExpression xsi:type="tFormalExpression">${approvalDecision == 'rejected'}</conditionExpression>
+    </sequenceFlow>
+    <serviceTask id="ServiceTask_AccountOpening" name="Account Opening / Enable Trading" camunda:type="external" camunda:topic="account-provisioning">
+      <incoming>Flow_GwRisk_To_AccountOpening</incoming>
+      <incoming>Flow_GwDecision_To_AccountOpening</incoming>
+    </serviceTask>
+    <sequenceFlow id="Flow_AccountOpening_To_Notify" sourceRef="ServiceTask_AccountOpening" targetRef="ServiceTask_NotifySalesClient" />
+    <serviceTask id="ServiceTask_NotifySalesClient" name="Notify Sales &#38; Client" camunda:type="external" camunda:topic="notifications" />
+    <sequenceFlow id="Flow_Notify_To_RecordAudit" sourceRef="ServiceTask_NotifySalesClient" targetRef="ServiceTask_RecordAuditTrail" />
+    <serviceTask id="ServiceTask_RecordAuditTrail" name="Record Audit Trail" camunda:type="external" camunda:topic="audit-log" />
+    <sequenceFlow id="Flow_RecordAudit_To_EndComplete" sourceRef="ServiceTask_RecordAuditTrail" targetRef="EndEvent_OnboardingComplete" />
+    <endEvent id="EndEvent_OnboardingComplete" name="Onboarding Complete" />
+    <endEvent id="EndEvent_Rejected" name="Rejected (Reason Logged)">
+      <incoming>Flow_0ylfm7q</incoming>
+    </endEvent>
+    <sequenceFlow id="Flow_1srkuh4" sourceRef="ServiceTask_EscalateOps_VerificationSLA" targetRef="UserTask_OpsRemediation" />
+    <exclusiveGateway id="Gateway_0xqpgfx" name="Proceed with Re-Verification?">
+      <incoming>Flow_0y9ulo7</incoming>
+      <incoming>Flow_1431pu5</incoming>
+      <outgoing>Flow_06w37vo</outgoing>
+      <outgoing>Flow_0ylfm7q</outgoing>
+    </exclusiveGateway>
+    <sequenceFlow id="Flow_0y9ulo7" sourceRef="UserTask_OpsRemediation" targetRef="Gateway_0xqpgfx" />
+    <sequenceFlow id="Flow_06w37vo" name="Yes" sourceRef="Gateway_0xqpgfx" targetRef="ServiceTask_VerifyDocuments" />
+    <sequenceFlow id="Flow_1431pu5" sourceRef="UserTask_OpsRemediation" targetRef="Gateway_0xqpgfx" />
+    <sequenceFlow id="Flow_0ylfm7q" name="No" sourceRef="Gateway_0xqpgfx" targetRef="EndEvent_Rejected" />
+    <sequenceFlow id="Flow_GwDecision_To_AccountOpening" name="Approved" sourceRef="Gateway_ComplianceDecision" targetRef="ServiceTask_AccountOpening">
+      <conditionExpression xsi:type="tFormalExpression">${approvalDecision == 'approved'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_GwRisk_To_AccountOpening" name="Low" sourceRef="Gateway_RiskCategory" targetRef="ServiceTask_AccountOpening">
+      <conditionExpression xsi:type="tFormalExpression">${riskCategory == 'Low'}</conditionExpression>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_ClientOnboardingKYC">
+    <bpmndi:BPMNPlane id="BPMNPlane_ClientOnboardingKYC" bpmnElement="Process_ClientOnboardingKYC">
+      <bpmndi:BPMNShape id="ServiceTask_AccountOpening_di" bpmnElement="ServiceTask_AccountOpening">
+        <dc:Bounds x="2380" y="100" width="200" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_NotifySalesClient_di" bpmnElement="ServiceTask_NotifySalesClient">
+        <dc:Bounds x="2640" y="100" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_RecordAuditTrail_di" bpmnElement="ServiceTask_RecordAuditTrail">
+        <dc:Bounds x="2850" y="100" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ComplianceDecision_di" bpmnElement="Gateway_ComplianceDecision" isMarkerVisible="true">
+        <dc:Bounds x="2435" y="285" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2356" y="283" width="88" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_OnboardingComplete_di" bpmnElement="EndEvent_OnboardingComplete">
+        <dc:Bounds x="3082" y="122" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3071" y="158" width="58" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Rejected_di" bpmnElement="EndEvent_Rejected">
+        <dc:Bounds x="3082" y="532" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3056" y="568" width="89" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_ApplicationSubmitted_di" bpmnElement="StartEvent_ApplicationSubmitted">
+        <dc:Bounds x="120" y="122" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="112" y="158" width="53" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EventSubProcess_SLA_di" bpmnElement="EventSubProcess_SLA" isExpanded="true">
+        <dc:Bounds x="120" y="490" width="660" height="180" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_ProcessSLA_di" bpmnElement="StartEvent_ProcessSLA">
+        <dc:Bounds x="150" y="552" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="136" y="588" width="65" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_SLAEscalation_SeniorMgmt_di" bpmnElement="ServiceTask_SLAEscalation_SeniorMgmt">
+        <dc:Bounds x="220" y="530" width="220" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_MarkCaseForAudit_di" bpmnElement="ServiceTask_MarkCaseForAudit">
+        <dc:Bounds x="470" y="530" width="220" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_SLAHandled_di" bpmnElement="EndEvent_SLAHandled">
+        <dc:Bounds x="710" y="552" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="695" y="588" width="67" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_SLA_Start_To_Escalate_di" bpmnElement="Flow_SLA_Start_To_Escalate">
+        <di:waypoint x="186" y="570" />
+        <di:waypoint x="220" y="570" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SLA_Escalate_To_Audit_di" bpmnElement="Flow_SLA_Escalate_To_Audit">
+        <di:waypoint x="440" y="570" />
+        <di:waypoint x="470" y="570" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SLA_Audit_To_End_di" bpmnElement="Flow_SLA_Audit_To_End">
+        <di:waypoint x="690" y="570" />
+        <di:waypoint x="710" y="570" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_CaptureClientData_di" bpmnElement="UserTask_CaptureClientData">
+        <dc:Bounds x="230" y="100" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_PersistClientData_di" bpmnElement="ServiceTask_PersistClientData">
+        <dc:Bounds x="380" y="100" width="140" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_UploadDocuments_di" bpmnElement="UserTask_UploadDocuments">
+        <dc:Bounds x="550" y="100" width="140" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_StoreDocuments_di" bpmnElement="ServiceTask_StoreDocuments">
+        <dc:Bounds x="720" y="100" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_VerifyDocuments_di" bpmnElement="ServiceTask_VerifyDocuments">
+        <dc:Bounds x="890" y="100" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_EscalateOps_VerificationSLA_di" bpmnElement="ServiceTask_EscalateOps_VerificationSLA">
+        <dc:Bounds x="838" y="270" width="220" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_DocumentsVerified_di" bpmnElement="Gateway_DocumentsVerified" isMarkerVisible="true">
+        <dc:Bounds x="1160" y="115" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1156" y="78" width="57" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_OpsRemediation_di" bpmnElement="UserTask_OpsRemediation">
+        <dc:Bounds x="1170" y="270" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_SanctionsPEP_di" bpmnElement="ServiceTask_SanctionsPEP">
+        <dc:Bounds x="1260" y="100" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_SanctionsDecision_di" bpmnElement="Gateway_SanctionsDecision" isMarkerVisible="true">
+        <dc:Bounds x="1495" y="115" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1476" y="91" width="88" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_ComplianceInvestigation_Sanctions_di" bpmnElement="UserTask_ComplianceInvestigation_Sanctions">
+        <dc:Bounds x="1410" y="270" width="220" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_SanctionsOutcome_di" bpmnElement="Gateway_SanctionsOutcome" isMarkerVisible="true">
+        <dc:Bounds x="1695" y="285" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1749" y="306" width="62" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BusinessRule_RiskAssessment_di" bpmnElement="BusinessRule_RiskAssessment">
+        <dc:Bounds x="1630" y="100" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_EscalateCompliance_RiskSLA_di" bpmnElement="ServiceTask_EscalateCompliance_RiskSLA">
+        <dc:Bounds x="1770" y="370" width="220" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_RiskCategory_di" bpmnElement="Gateway_RiskCategory" isMarkerVisible="true">
+        <dc:Bounds x="2010" y="115" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2000" y="78" width="70" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_EnhancedDueDiligence_di" bpmnElement="UserTask_EnhancedDueDiligence">
+        <dc:Bounds x="2090" y="440" width="220" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_ComplianceReview_di" bpmnElement="UserTask_ComplianceReview">
+        <dc:Bounds x="2090" y="270" width="220" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0xqpgfx_di" bpmnElement="Gateway_0xqpgfx" isMarkerVisible="true">
+        <dc:Bounds x="1235" y="435" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1294.5" y="446" width="85" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BoundaryTimer_RiskAssessment_di" bpmnElement="BoundaryTimer_RiskAssessment">
+        <dc:Bounds x="1772" y="162" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1769" y="198" width="43" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BoundaryTimer_VerifyDocs_di" bpmnElement="BoundaryTimer_VerifyDocs">
+        <dc:Bounds x="918" y="162" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="915" y="198" width="43" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_Start_To_Capture_di" bpmnElement="Flow_Start_To_Capture">
+        <di:waypoint x="156" y="140" />
+        <di:waypoint x="230" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Capture_To_Persist_di" bpmnElement="Flow_Capture_To_Persist">
+        <di:waypoint x="350" y="140" />
+        <di:waypoint x="380" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Persist_To_CollectDocs_di" bpmnElement="Flow_Persist_To_CollectDocs">
+        <di:waypoint x="520" y="140" />
+        <di:waypoint x="550" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CollectDocs_To_StoreDocs_di" bpmnElement="Flow_CollectDocs_To_StoreDocs">
+        <di:waypoint x="690" y="140" />
+        <di:waypoint x="720" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_StoreDocs_To_VerifyDocs_di" bpmnElement="Flow_StoreDocs_To_VerifyDocs">
+        <di:waypoint x="860" y="140" />
+        <di:waypoint x="890" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Boundary_Verify_To_EscalateOps_di" bpmnElement="Flow_Boundary_Verify_To_EscalateOps">
+        <di:waypoint x="936" y="198" />
+        <di:waypoint x="936" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_VerifyDocs_To_GwDocs_di" bpmnElement="Flow_VerifyDocs_To_GwDocs">
+        <di:waypoint x="1050" y="140" />
+        <di:waypoint x="1160" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_GwDocs_To_Sanctions_di" bpmnElement="Flow_GwDocs_To_Sanctions">
+        <di:waypoint x="1210" y="140" />
+        <di:waypoint x="1260" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1226" y="115" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_GwDocs_To_Repair_di" bpmnElement="Flow_GwDocs_To_Repair">
+        <di:waypoint x="1185" y="165" />
+        <di:waypoint x="1185" y="218" />
+        <di:waypoint x="1225" y="218" />
+        <di:waypoint x="1225" y="270" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1192" y="175" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Sanctions_To_GwSanctions_di" bpmnElement="Flow_Sanctions_To_GwSanctions">
+        <di:waypoint x="1440" y="140" />
+        <di:waypoint x="1495" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_GwSanctions_To_Investigation_di" bpmnElement="Flow_GwSanctions_To_Investigation">
+        <di:waypoint x="1520" y="165" />
+        <di:waypoint x="1520" y="270" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1526" y="207" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_GwSanctions_To_Risk_di" bpmnElement="Flow_GwSanctions_To_Risk">
+        <di:waypoint x="1545" y="140" />
+        <di:waypoint x="1630" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1580" y="115" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Investigation_To_GwOutcome_di" bpmnElement="Flow_Investigation_To_GwOutcome">
+        <di:waypoint x="1630" y="310" />
+        <di:waypoint x="1695" y="310" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_GwOutcome_To_Risk_di" bpmnElement="Flow_GwOutcome_To_Risk">
+        <di:waypoint x="1720" y="285" />
+        <di:waypoint x="1720" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_GwOutcome_To_EndRejected_di" bpmnElement="Flow_GwOutcome_To_EndRejected">
+        <di:waypoint x="1720" y="335" />
+        <di:waypoint x="1720" y="552" />
+        <di:waypoint x="3082" y="552" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1728" y="434" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Boundary_Risk_To_EscalateCompliance_di" bpmnElement="Flow_Boundary_Risk_To_EscalateCompliance">
+        <di:waypoint x="1808" y="180" />
+        <di:waypoint x="1880" y="180" />
+        <di:waypoint x="1880" y="370" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Risk_To_GwRiskCategory_di" bpmnElement="Flow_Risk_To_GwRiskCategory">
+        <di:waypoint x="1810" y="140" />
+        <di:waypoint x="2010" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_GwRisk_To_AccountOpening_di" bpmnElement="Flow_GwRisk_To_AccountOpening">
+        <di:waypoint x="2060" y="140" />
+        <di:waypoint x="2380" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2210" y="115" width="22" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_GwRisk_To_ComplianceReview_di" bpmnElement="Flow_GwRisk_To_ComplianceReview">
+        <di:waypoint x="2050" y="150" />
+        <di:waypoint x="2050" y="230" />
+        <di:waypoint x="2200" y="230" />
+        <di:waypoint x="2200" y="270" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2090" y="198" width="40" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_GwRisk_To_EDD_di" bpmnElement="Flow_GwRisk_To_EDD">
+        <di:waypoint x="2035" y="165" />
+        <di:waypoint x="2035" y="480" />
+        <di:waypoint x="2090" y="480" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2038" y="323" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_EDD_To_ComplianceReview_di" bpmnElement="Flow_EDD_To_ComplianceReview">
+        <di:waypoint x="2310" y="480" />
+        <di:waypoint x="2435" y="480" />
+        <di:waypoint x="2435" y="310" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ComplianceReview_To_GwDecision_di" bpmnElement="Flow_ComplianceReview_To_GwDecision">
+        <di:waypoint x="2310" y="310" />
+        <di:waypoint x="2435" y="310" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_GwDecision_To_AccountOpening_di" bpmnElement="Flow_GwDecision_To_AccountOpening">
+        <di:waypoint x="2460" y="285" />
+        <di:waypoint x="2460" y="180" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2466" y="253" width="47" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_GwDecision_To_EndRejected_di" bpmnElement="Flow_GwDecision_To_EndRejected">
+        <di:waypoint x="2460" y="335" />
+        <di:waypoint x="2460" y="551" />
+        <di:waypoint x="3082" y="551" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2468" y="360" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_AccountOpening_To_Notify_di" bpmnElement="Flow_AccountOpening_To_Notify">
+        <di:waypoint x="2580" y="140" />
+        <di:waypoint x="2640" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1srkuh4_di" bpmnElement="Flow_1srkuh4">
+        <di:waypoint x="1058" y="320" />
+        <di:waypoint x="1170" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0y9ulo7_di" bpmnElement="Flow_0y9ulo7">
+        <di:waypoint x="1260" y="350" />
+        <di:waypoint x="1260" y="435" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06w37vo_di" bpmnElement="Flow_06w37vo">
+        <di:waypoint x="1235" y="460" />
+        <di:waypoint x="1110" y="460" />
+        <di:waypoint x="1110" y="170" />
+        <di:waypoint x="1050" y="170" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1191" y="433" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1431pu5_di" bpmnElement="Flow_1431pu5">
+        <di:waypoint x="1260" y="350" />
+        <di:waypoint x="1260" y="435" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ylfm7q_di" bpmnElement="Flow_0ylfm7q">
+        <di:waypoint x="1260" y="485" />
+        <di:waypoint x="1260" y="550" />
+        <di:waypoint x="3082" y="550" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1268" y="509" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Notify_To_RecordAudit_di" bpmnElement="Flow_Notify_To_RecordAudit">
+        <di:waypoint x="2820" y="140" />
+        <di:waypoint x="2850" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RecordAudit_To_EndComplete_di" bpmnElement="Flow_RecordAudit_To_EndComplete">
+        <di:waypoint x="3010" y="140" />
+        <di:waypoint x="3082" y="140" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

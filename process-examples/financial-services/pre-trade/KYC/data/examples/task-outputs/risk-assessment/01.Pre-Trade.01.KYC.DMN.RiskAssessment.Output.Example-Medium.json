@@ -1,0 +1,109 @@
+{
+  "taskId": "TASK-RISK-20250108-M6P3R7",
+  "applicationId": "APP-20250108-T3R8N5",
+  "completedTimestamp": "2025-01-08T09:18:15Z",
+  "riskCategory": "Medium",
+  "overallRiskScore": 52.8,
+  "riskFactors": {
+    "jurisdictionRisk": {
+      "score": 15.0,
+      "rating": "Low",
+      "weight": 0.25,
+      "rationale": "UK is a low-risk jurisdiction with strong AML/CFT framework",
+      "contributingFactors": [
+        "FATF compliant jurisdiction",
+        "Strong regulatory oversight"
+      ]
+    },
+    "customerTypeRisk": {
+      "score": 45.0,
+      "rating": "Medium",
+      "weight": 0.20,
+      "rationale": "Private limited company in technology sector with moderate complexity",
+      "contributingFactors": [
+        "Corporate entity",
+        "Clear ownership structure",
+        "Regulated sector clients"
+      ]
+    },
+    "productRisk": {
+      "score": 40.0,
+      "rating": "Medium",
+      "weight": 0.20,
+      "rationale": "Fixed income and FX products with moderate complexity",
+      "contributingFactors": [
+        "FX trading increases complexity",
+        "Corporate hedging activities",
+        "Higher transaction volumes expected"
+      ]
+    },
+    "deliveryChannelRisk": {
+      "score": 35.0,
+      "rating": "Medium",
+      "weight": 0.15,
+      "rationale": "Sales referral requires additional verification",
+      "contributingFactors": [
+        "Introduced via sales rather than direct",
+        "Multiple authorised signatories",
+        "Corporate governance structure"
+      ]
+    },
+    "pepRisk": {
+      "score": 10.0,
+      "rating": "Low",
+      "weight": 0.10,
+      "rationale": "No PEP connections identified",
+      "contributingFactors": [
+        "Beneficial owners not PEPs",
+        "No government connections"
+      ]
+    },
+    "volumeRisk": {
+      "score": 65.0,
+      "rating": "Medium",
+      "weight": 0.05,
+      "rationale": "Significant expected trading volume requires monitoring",
+      "contributingFactors": [
+        "Annual volume £5,000,000",
+        "Large initial deposit £500,000",
+        "Regular high-value transactions expected"
+      ]
+    },
+    "sourceOfFundsRisk": {
+      "score": 25.0,
+      "rating": "Low",
+      "weight": 0.05,
+      "rationale": "Operating revenue from established business",
+      "contributingFactors": [
+        "Established company (6+ years)",
+        "Verified annual revenue",
+        "Transparent business model"
+      ]
+    },
+    "businessRelationshipRisk": {
+      "score": 50.0,
+      "rating": "Medium",
+      "weight": 0.05,
+      "rationale": "Financial services clients increases risk profile",
+      "contributingFactors": [
+        "Serves financial services sector",
+        "Potential for complex transactions",
+        "Requires enhanced understanding of business model"
+      ]
+    }
+  },
+  "dmnDecisionTable": "RiskAssessment-v2.1",
+  "dmnRuleMatched": "RULE-015-MEDIUM",
+  "riskMitigationRequired": true,
+  "recommendedControls": [
+    "enhanced-monitoring",
+    "senior-approval-required",
+    "source-of-funds-verification",
+    "periodic-review-required"
+  ],
+  "autoApprovalEligible": false,
+  "approvalAuthority": "compliance-officer",
+  "reviewFrequency": "semi-annual",
+  "processingDuration": 0.6,
+  "assessmentNotes": "Medium-risk corporate client requires compliance officer review. Enhanced monitoring recommended due to trading volumes and FX exposure."
+}

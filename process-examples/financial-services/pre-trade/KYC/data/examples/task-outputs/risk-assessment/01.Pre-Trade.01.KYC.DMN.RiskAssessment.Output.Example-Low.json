@@ -1,0 +1,97 @@
+{
+  "taskId": "TASK-RISK-20250108-L2N8M4",
+  "applicationId": "APP-20250108-F7K9M2",
+  "completedTimestamp": "2025-01-08T14:46:42Z",
+  "riskCategory": "Low",
+  "overallRiskScore": 22.5,
+  "riskFactors": {
+    "jurisdictionRisk": {
+      "score": 15.0,
+      "rating": "Low",
+      "weight": 0.25,
+      "rationale": "UK is a low-risk jurisdiction with strong AML/CFT framework and FATF compliance",
+      "contributingFactors": [
+        "FATF compliant jurisdiction",
+        "Strong regulatory oversight",
+        "Low corruption perception index"
+      ]
+    },
+    "customerTypeRisk": {
+      "score": 20.0,
+      "rating": "Low",
+      "weight": 0.20,
+      "rationale": "Individual retail client with transparent employment",
+      "contributingFactors": [
+        "Individual client",
+        "Employed professional",
+        "Clear source of wealth"
+      ]
+    },
+    "productRisk": {
+      "score": 25.0,
+      "rating": "Low",
+      "weight": 0.20,
+      "rationale": "Standard equity and fixed income products with low complexity",
+      "contributingFactors": [
+        "Mainstream asset classes",
+        "No complex derivatives",
+        "Regulated markets only"
+      ]
+    },
+    "deliveryChannelRisk": {
+      "score": 18.0,
+      "rating": "Low",
+      "weight": 0.15,
+      "rationale": "Direct client portal with full audit trail",
+      "contributingFactors": [
+        "Non-face-to-face but verified electronically",
+        "Strong authentication",
+        "Full transaction logging"
+      ]
+    },
+    "pepRisk": {
+      "score": 10.0,
+      "rating": "Low",
+      "weight": 0.10,
+      "rationale": "No PEP connections identified",
+      "contributingFactors": [
+        "Not a PEP",
+        "No family PEP connections",
+        "No close associate PEP connections"
+      ]
+    },
+    "volumeRisk": {
+      "score": 30.0,
+      "rating": "Low",
+      "weight": 0.05,
+      "rationale": "Moderate expected trading volume appropriate for profile",
+      "contributingFactors": [
+        "Annual volume £150,000",
+        "Regular trading frequency",
+        "Consistent with stated employment income"
+      ]
+    },
+    "sourceOfFundsRisk": {
+      "score": 15.0,
+      "rating": "Low",
+      "weight": 0.05,
+      "rationale": "Employment income is verifiable and appropriate",
+      "contributingFactors": [
+        "Employment verified",
+        "Salary appropriate for profession",
+        "No complex wealth structures"
+      ]
+    }
+  },
+  "dmnDecisionTable": "RiskAssessment-v2.1",
+  "dmnRuleMatched": "RULE-001-LOW",
+  "riskMitigationRequired": false,
+  "recommendedControls": [
+    "ongoing-monitoring"
+  ],
+  "autoApprovalEligible": true,
+  "approvalAuthority": "system",
+  "reviewFrequency": "annual",
+  "processingDuration": 0.4,
+  "assessmentNotes": "Standard low-risk individual client profile. Eligible for auto-approval and standard ongoing monitoring."
+}

@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+    xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1"
+    targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.39.0">
+    <bpmn:process id="PostTradeSettlementProcess" name="Post-Trade Settlement Process"
+        isExecutable="true">
+        <bpmn:startEvent id="StartEvent_TradeReadyForSettlement" name="Trade Ready for Settlement"
+            camunda:formKey="embedded:app:forms/trade-ready-form.html">
+            <bpmn:extensionElements>
+                <camunda:executionListener delegateExpression="${tradeReadyListener}" event="start" />
+            </bpmn:extensionElements>
+            <bpmn:outgoing>SequenceFlow_1</bpmn:outgoing>
+        </bpmn:startEvent>
+        <bpmn:userTask id="UserTask_EnrichSettlementInstructions"
+            name="Enrich Settlement Instructions" camunda:assignee="${middleOfficeUser}"
+            camunda:candidateGroups="middle-office">
+            <bpmn:extensionElements>
+                <camunda:formData>
+                    <camunda:formField id="ssiRetrieved" label="SSI Retrieved" type="boolean" />
+                    <camunda:formField id="tradeData" label="Trade Specific Data" type="string" />
+                    <camunda:formField id="instructionsComplete" label="Instructions Complete"
+                        type="boolean" />
+                    <camunda:formField id="settlementDate" label="Settlement Date" type="date" />
+                </camunda:formData>
+                <camunda:inputOutput>
+                    <camunda:inputParameter name="tradeId">${tradeId}</camunda:inputParameter>
+                    <camunda:outputParameter name="instructionsComplete">${instructionsComplete}</camunda:outputParameter>
+                </camunda:inputOutput>
+            </bpmn:extensionElements>
+            <bpmn:incoming>SequenceFlow_1</bpmn:incoming>
+            <bpmn:incoming>SequenceFlow_FromRemediation</bpmn:incoming>
+            <bpmn:outgoing>SequenceFlow_2</bpmn:outgoing>
+        </bpmn:userTask>
+        <bpmn:exclusiveGateway id="ExclusiveGateway_DataValid" name="Data Complete?">
+            <bpmn:incoming>SequenceFlow_2</bpmn:incoming>
+            <bpmn:outgoing>SequenceFlow_DataIncomplete</bpmn:outgoing>
+            <bpmn:outgoing>SequenceFlow_DataComplete</bpmn:outgoing>
+        </bpmn:exclusiveGateway>
+        <bpmn:userTask id="UserTask_DataRemediation" name="Data Remediation"
+            camunda:assignee="${operationsUser}" camunda:candidateGroups="operations">
+            <bpmn:extensionElements>
+                <camunda:formData>
+                    <camunda:formField id="missingDataRequested"
+                        label="Missing Data Requested from Front Office" type="boolean" />
+                    <camunda:formField id="remediationNotes" label="Remediation Notes" type="string" />
+                </camunda:formData>
+            </bpmn:extensionElements>
+            <bpmn:incoming>SequenceFlow_DataIncomplete</bpmn:incoming>
+            <bpmn:outgoing>SequenceFlow_FromRemediation</bpmn:outgoing>
+        </bpmn:userTask>
+        <bpmn:serviceTask id="ServiceTask_GenerateSettlementMessage"
+            name="Generate Settlement Instruction Message"
+            camunda:delegateExpression="${settlementMessageGenerator}">
+            <bpmn:extensionElements>
+                <camunda:inputOutput>
+                    <camunda:inputParameter name="messageFormat">ISO20022</camunda:inputParameter>
+                    <camunda:inputParameter name="attachIdentifiers">true</camunda:inputParameter>
+                    <camunda:inputParameter name="applyDigitalSigning">true</camunda:inputParameter>
+                    <camunda:outputParameter name="settlementMessage">${settlementMessage}</camunda:outputParameter>
+                    <camunda:outputParameter name="messageId">${messageId}</camunda:outputParameter>
+                </camunda:inputOutput>
+            </bpmn:extensionElements>
+            <bpmn:incoming>SequenceFlow_DataComplete</bpmn:incoming>
+            <bpmn:outgoing>SequenceFlow_3</bpmn:outgoing>
+        </bpmn:serviceTask>
+        <bpmn:serviceTask id="ServiceTask_TransmitToCustodian" name="Transmit to Custodian/CCP"
+            camunda:delegateExpression="${custodianTransmissionService}">
+            <bpmn:extensionElements>
+                <camunda:inputOutput>
+                    <camunda:inputParameter name="transmissionChannel">SWIFT</camunda:inputParameter>
+                    <camunda:inputParameter name="settlementMessage">${settlementMessage}</camunda:inputParameter>
+                    <camunda:outputParameter name="transmissionId">${transmissionId}</camunda:outputParameter>
+                    <camunda:outputParameter name="acknowledgmentReceived">${acknowledgmentReceived}</camunda:outputParameter>
+                </camunda:inputOutput>
+            </bpmn:extensionElements>
+            <bpmn:incoming>SequenceFlow_3</bpmn:incoming>
+            <bpmn:incoming>SequenceFlow_RetryTransmission</bpmn:incoming>
+            <bpmn:outgoing>SequenceFlow_4</bpmn:outgoing>
+        </bpmn:serviceTask>
+        <bpmn:serviceTask id="ServiceTask_MonitorSettlementStatus" name="Monitor Settlement Status"
+            camunda:delegateExpression="${settlementMonitoringService}">
+            <bpmn:extensionElements>
+                <camunda:inputOutput>
+                    <camunda:inputParameter name="transmissionId">${transmissionId}</camunda:inputParameter>
+                    <camunda:inputParameter name="pollingInterval">PT1H</camunda:inputParameter>
+                    <camunda:outputParameter name="settlementStatus">${settlementStatus}</camunda:outputParameter>
+                    <camunda:outputParameter name="settlementComplete">${settlementComplete}</camunda:outputParameter>
+                </camunda:inputOutput>
+            </bpmn:extensionElements>
+            <bpmn:incoming>SequenceFlow_4</bpmn:incoming>
+            <bpmn:outgoing>SequenceFlow_5</bpmn:outgoing>
+        </bpmn:serviceTask>
+        <bpmn:boundaryEvent id="BoundaryEvent_SettlementTimeout" name="Settlement Timeout (48h)"
+            attachedToRef="ServiceTask_MonitorSettlementStatus">
+            <bpmn:outgoing>SequenceFlow_Timeout</bpmn:outgoing>
+            <bpmn:timerEventDefinition>
+                <bpmn:timeDuration>P2D</bpmn:timeDuration>
+            </bpmn:timerEventDefinition>
+        </bpmn:boundaryEvent>
+        <bpmn:exclusiveGateway id="ExclusiveGateway_SettlementStatus" name="Settled?">
+            <bpmn:incoming>SequenceFlow_5</bpmn:incoming>
+            <bpmn:incoming>SequenceFlow_Timeout</bpmn:incoming>
+            <bpmn:outgoing>SequenceFlow_Settled</bpmn:outgoing>
+            <bpmn:outgoing>SequenceFlow_Failed</bpmn:outgoing>
+        </bpmn:exclusiveGateway>
+        <bpmn:serviceTask id="ServiceTask_SettlementCompletion" name="Settlement Completion Process"
+            camunda:delegateExpression="${settlementCompletionService}">
+            <bpmn:extensionElements>
+                <camunda:inputOutput>
+                    <camunda:inputParameter name="updatePositions">true</camunda:inputParameter>
+                    <camunda:inputParameter name="createReconciliationJobs">true</camunda:inputParameter>
+                    <camunda:inputParameter name="notifyTeams">true</camunda:inputParameter>
+                    <camunda:outputParameter name="settlementConfirmed">${settlementConfirmed}</camunda:outputParameter>
+                </camunda:inputOutput>
+            </bpmn:extensionElements>
+            <bpmn:incoming>SequenceFlow_Settled</bpmn:incoming>
+            <bpmn:outgoing>SequenceFlow_ToSuccessEnd</bpmn:outgoing>
+        </bpmn:serviceTask>
+        <bpmn:serviceTask id="ServiceTask_CreateSettlementFailCase"
+            name="Create Settlement Fail Case"
+            camunda:delegateExpression="${settlementFailCaseService}">
+            <bpmn:extensionElements>
+                <camunda:inputOutput>
+                    <camunda:inputParameter name="failureReason">${failureReason}</camunda:inputParameter>
+                    <camunda:inputParameter name="transmissionId">${transmissionId}</camunda:inputParameter>
+                    <camunda:outputParameter name="failCaseId">${failCaseId}</camunda:outputParameter>
+                </camunda:inputOutput>
+            </bpmn:extensionElements>
+            <bpmn:incoming>SequenceFlow_Failed</bpmn:incoming>
+            <bpmn:outgoing>SequenceFlow_6</bpmn:outgoing>
+        </bpmn:serviceTask>
+        <bpmn:userTask id="UserTask_FailResolution" name="Fail Resolution"
+            camunda:assignee="${backOfficeUser}" camunda:candidateGroups="back-office">
+            <bpmn:extensionElements>
+                <camunda:formData>
+                    <camunda:formField id="rootCauseAnalysis" label="Root Cause Analysis"
+                        type="string" />
+                    <camunda:formField id="correctionMade" label="Correction Made" type="boolean" />
+                    <camunda:formField id="retryRecommended" label="Retry Recommended"
+                        type="boolean" />
+                    <camunda:formField id="retryCount" label="Retry Count" type="long"
+                        defaultValue="0" />
+                </camunda:formData>
+                <camunda:inputOutput>
+                    <camunda:inputParameter name="failCaseId">${failCaseId}</camunda:inputParameter>
+                    <camunda:outputParameter name="retryCount">${retryCount + 1}</camunda:outputParameter>
+                </camunda:inputOutput>
+            </bpmn:extensionElements>
+            <bpmn:incoming>SequenceFlow_6</bpmn:incoming>
+            <bpmn:outgoing>SequenceFlow_7</bpmn:outgoing>
+        </bpmn:userTask>
+        <bpmn:exclusiveGateway id="ExclusiveGateway_RetryDecision" name="Retry Settlement?">
+            <bpmn:incoming>SequenceFlow_7</bpmn:incoming>
+            <bpmn:outgoing>SequenceFlow_Retry</bpmn:outgoing>
+            <bpmn:outgoing>SequenceFlow_Escalate</bpmn:outgoing>
+        </bpmn:exclusiveGateway>
+        <bpmn:userTask id="UserTask_Escalation" name="Escalation"
+            camunda:assignee="${seniorOperationsManager}"
+            camunda:candidateGroups="senior-management">
+            <bpmn:extensionElements>
+                <camunda:formData>
+                    <camunda:formField id="escalationReason" label="Escalation Reason" type="string" />
+                    <camunda:formField id="incidentCreated" label="Incident Record Created"
+                        type="boolean" />
+                    <camunda:formField id="managementNotified" label="Management Notified"
+                        type="boolean" />
+                </camunda:formData>
+                <camunda:inputOutput>
+                    <camunda:inputParameter name="failCaseId">${failCaseId}</camunda:inputParameter>
+                    <camunda:inputParameter name="retryCount">${retryCount}</camunda:inputParameter>
+                </camunda:inputOutput>
+            </bpmn:extensionElements>
+            <bpmn:incoming>SequenceFlow_Escalate</bpmn:incoming>
+            <bpmn:outgoing>SequenceFlow_ToEscalationEnd</bpmn:outgoing>
+        </bpmn:userTask>
+        <bpmn:endEvent id="EndEvent_SettlementSuccessful" name="Settlement Successful">
+            <bpmn:extensionElements>
+                <camunda:executionListener delegateExpression="${settlementSuccessListener}"
+                    event="start" />
+            </bpmn:extensionElements>
+            <bpmn:incoming>SequenceFlow_ToSuccessEnd</bpmn:incoming>
+        </bpmn:endEvent>
+        <bpmn:endEvent id="EndEvent_SettlementEscalated" name="Settlement Escalated/Failed">
+            <bpmn:extensionElements>
+                <camunda:executionListener delegateExpression="${settlementEscalationListener}"
+                    event="start" />
+            </bpmn:extensionElements>
+            <bpmn:incoming>SequenceFlow_ToEscalationEnd</bpmn:incoming>
+        </bpmn:endEvent>
+        <bpmn:sequenceFlow id="SequenceFlow_1" sourceRef="StartEvent_TradeReadyForSettlement"
+            targetRef="UserTask_EnrichSettlementInstructions" />
+        <bpmn:sequenceFlow id="SequenceFlow_2" sourceRef="UserTask_EnrichSettlementInstructions"
+            targetRef="ExclusiveGateway_DataValid" />
+        <bpmn:sequenceFlow id="SequenceFlow_DataIncomplete" name="No"
+            sourceRef="ExclusiveGateway_DataValid" targetRef="UserTask_DataRemediation">
+            <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!instructionsComplete}</bpmn:conditionExpression>
+        </bpmn:sequenceFlow>
+        <bpmn:sequenceFlow id="SequenceFlow_DataComplete" name="Yes"
+            sourceRef="ExclusiveGateway_DataValid" targetRef="ServiceTask_GenerateSettlementMessage">
+            <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${instructionsComplete}</bpmn:conditionExpression>
+        </bpmn:sequenceFlow>
+        <bpmn:sequenceFlow id="SequenceFlow_FromRemediation" sourceRef="UserTask_DataRemediation"
+            targetRef="UserTask_EnrichSettlementInstructions" />
+        <bpmn:sequenceFlow id="SequenceFlow_3" sourceRef="ServiceTask_GenerateSettlementMessage"
+            targetRef="ServiceTask_TransmitToCustodian" />
+        <bpmn:sequenceFlow id="SequenceFlow_4" sourceRef="ServiceTask_TransmitToCustodian"
+            targetRef="ServiceTask_MonitorSettlementStatus" />
+        <bpmn:sequenceFlow id="SequenceFlow_5" sourceRef="ServiceTask_MonitorSettlementStatus"
+            targetRef="ExclusiveGateway_SettlementStatus" />
+        <bpmn:sequenceFlow id="SequenceFlow_Timeout" sourceRef="BoundaryEvent_SettlementTimeout"
+            targetRef="ExclusiveGateway_SettlementStatus" />
+        <bpmn:sequenceFlow id="SequenceFlow_Settled" name="Yes"
+            sourceRef="ExclusiveGateway_SettlementStatus"
+            targetRef="ServiceTask_SettlementCompletion">
+            <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${settlementComplete}</bpmn:conditionExpression>
+        </bpmn:sequenceFlow>
+        <bpmn:sequenceFlow id="SequenceFlow_Failed" name="No"
+            sourceRef="ExclusiveGateway_SettlementStatus"
+            targetRef="ServiceTask_CreateSettlementFailCase">
+            <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!settlementComplete}</bpmn:conditionExpression>
+        </bpmn:sequenceFlow>
+        <bpmn:sequenceFlow id="SequenceFlow_6" sourceRef="ServiceTask_CreateSettlementFailCase"
+            targetRef="UserTask_FailResolution" />
+        <bpmn:sequenceFlow id="SequenceFlow_7" sourceRef="UserTask_FailResolution"
+            targetRef="ExclusiveGateway_RetryDecision" />
+        <bpmn:sequenceFlow id="SequenceFlow_Retry" name="Yes"
+            sourceRef="ExclusiveGateway_RetryDecision" targetRef="ServiceTask_TransmitToCustodian">
+            <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retryRecommended and
+                retryCount &lt; 3}</bpmn:conditionExpression>
+        </bpmn:sequenceFlow>
+        <bpmn:sequenceFlow id="SequenceFlow_RetryTransmission"
+            sourceRef="ExclusiveGateway_RetryDecision" targetRef="ServiceTask_TransmitToCustodian" />
+        <bpmn:sequenceFlow id="SequenceFlow_Escalate" name="No"
+            sourceRef="ExclusiveGateway_RetryDecision" targetRef="UserTask_Escalation">
+            <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!retryRecommended or
+                retryCount &gt;= 3}</bpmn:conditionExpression>
+        </bpmn:sequenceFlow>
+        <bpmn:sequenceFlow id="SequenceFlow_ToSuccessEnd"
+            sourceRef="ServiceTask_SettlementCompletion" targetRef="EndEvent_SettlementSuccessful" />
+        <bpmn:sequenceFlow id="SequenceFlow_ToEscalationEnd" sourceRef="UserTask_Escalation"
+            targetRef="EndEvent_SettlementEscalated" />
+    </bpmn:process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+        <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="PostTradeSettlementProcess">
+            <bpmndi:BPMNShape id="StartEvent_TradeReadyForSettlement_di"
+                bpmnElement="StartEvent_TradeReadyForSettlement">
+                <dc:Bounds x="170" y="200" width="36" height="36" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="148" y="243" width="80" height="27" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="UserTask_EnrichSettlementInstructions_di"
+                bpmnElement="UserTask_EnrichSettlementInstructions">
+                <dc:Bounds x="270" y="178" width="100" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="ExclusiveGateway_DataValid_di"
+                bpmnElement="ExclusiveGateway_DataValid" isMarkerVisible="true">
+                <dc:Bounds x="420" y="193" width="50" height="50" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="405" y="163" width="80" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="UserTask_DataRemediation_di"
+                bpmnElement="UserTask_DataRemediation">
+                <dc:Bounds x="395" y="300" width="100" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="ServiceTask_GenerateSettlementMessage_di"
+                bpmnElement="ServiceTask_GenerateSettlementMessage">
+                <dc:Bounds x="520" y="178" width="100" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="ServiceTask_TransmitToCustodian_di"
+                bpmnElement="ServiceTask_TransmitToCustodian">
+                <dc:Bounds x="670" y="178" width="100" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="ServiceTask_MonitorSettlementStatus_di"
+                bpmnElement="ServiceTask_MonitorSettlementStatus">
+                <dc:Bounds x="820" y="178" width="100" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="ExclusiveGateway_SettlementStatus_di"
+                bpmnElement="ExclusiveGateway_SettlementStatus" isMarkerVisible="true">
+                <dc:Bounds x="970" y="193" width="50" height="50" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="1029" y="211" width="41" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="ServiceTask_SettlementCompletion_di"
+                bpmnElement="ServiceTask_SettlementCompletion">
+                <dc:Bounds x="1070" y="100" width="100" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="ServiceTask_CreateSettlementFailCase_di"
+                bpmnElement="ServiceTask_CreateSettlementFailCase">
+                <dc:Bounds x="945" y="300" width="100" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="EndEvent_SettlementSuccessful_di"
+                bpmnElement="EndEvent_SettlementSuccessful">
+                <dc:Bounds x="1220" y="122" width="36" height="36" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="1211" y="165" width="54" height="27" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="EndEvent_SettlementEscalated_di"
+                bpmnElement="EndEvent_SettlementEscalated">
+                <dc:Bounds x="1220" y="532" width="36" height="36" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="1197" y="575" width="82" height="27" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="ExclusiveGateway_RetryDecision_di"
+                bpmnElement="ExclusiveGateway_RetryDecision" isMarkerVisible="true">
+                <dc:Bounds x="695" y="415" width="50" height="50" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="595" y="433" width="89" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="UserTask_Escalation_di" bpmnElement="UserTask_Escalation">
+                <dc:Bounds x="670" y="510" width="100" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="UserTask_FailResolution_di" bpmnElement="UserTask_FailResolution">
+                <dc:Bounds x="820" y="400" width="100" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="BoundaryEvent_SettlementTimeout_di"
+                bpmnElement="BoundaryEvent_SettlementTimeout">
+                <dc:Bounds x="852" y="240" width="36" height="36" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="886" y="264" width="68" height="27" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="SequenceFlow_1_di" bpmnElement="SequenceFlow_1">
+                <di:waypoint x="206" y="218" />
+                <di:waypoint x="270" y="218" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_2_di" bpmnElement="SequenceFlow_2">
+                <di:waypoint x="370" y="218" />
+                <di:waypoint x="420" y="218" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_DataIncomplete_di"
+                bpmnElement="SequenceFlow_DataIncomplete">
+                <di:waypoint x="445" y="243" />
+                <di:waypoint x="445" y="300" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="453" y="269" width="15" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_DataComplete_di"
+                bpmnElement="SequenceFlow_DataComplete">
+                <di:waypoint x="470" y="218" />
+                <di:waypoint x="520" y="218" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="487" y="200" width="18" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_FromRemediation_di"
+                bpmnElement="SequenceFlow_FromRemediation">
+                <di:waypoint x="395" y="340" />
+                <di:waypoint x="320" y="340" />
+                <di:waypoint x="320" y="258" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_3_di" bpmnElement="SequenceFlow_3">
+                <di:waypoint x="620" y="218" />
+                <di:waypoint x="670" y="218" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_4_di" bpmnElement="SequenceFlow_4">
+                <di:waypoint x="770" y="218" />
+                <di:waypoint x="820" y="218" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_5_di" bpmnElement="SequenceFlow_5">
+                <di:waypoint x="920" y="218" />
+                <di:waypoint x="970" y="218" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_Timeout_di" bpmnElement="SequenceFlow_Timeout">
+                <di:waypoint x="888" y="258" />
+                <di:waypoint x="995" y="258" />
+                <di:waypoint x="995" y="243" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_Settled_di" bpmnElement="SequenceFlow_Settled">
+                <di:waypoint x="995" y="193" />
+                <di:waypoint x="995" y="140" />
+                <di:waypoint x="1070" y="140" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="1003" y="164" width="18" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_Failed_di" bpmnElement="SequenceFlow_Failed">
+                <di:waypoint x="995" y="243" />
+                <di:waypoint x="995" y="300" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="1003" y="269" width="15" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_6_di" bpmnElement="SequenceFlow_6">
+                <di:waypoint x="945" y="340" />
+                <di:waypoint x="870" y="340" />
+                <di:waypoint x="870" y="400" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_7_di" bpmnElement="SequenceFlow_7">
+                <di:waypoint x="820" y="440" />
+                <di:waypoint x="745" y="440" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_Retry_di" bpmnElement="SequenceFlow_Retry">
+                <di:waypoint x="720" y="415" />
+                <di:waypoint x="720" y="258" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="691" y="388" width="18" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_Escalate_di" bpmnElement="SequenceFlow_Escalate">
+                <di:waypoint x="720" y="465" />
+                <di:waypoint x="720" y="510" />
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="692" y="464" width="15" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_ToSuccessEnd_di"
+                bpmnElement="SequenceFlow_ToSuccessEnd">
+                <di:waypoint x="1170" y="140" />
+                <di:waypoint x="1220" y="140" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_ToEscalationEnd_di"
+                bpmnElement="SequenceFlow_ToEscalationEnd">
+                <di:waypoint x="770" y="550" />
+                <di:waypoint x="1220" y="550" />
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</bpmn:definitions>

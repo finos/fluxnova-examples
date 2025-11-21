@@ -1,0 +1,289 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://finos.org/schemas/kyc/task/verify-documents-output.schema.json",
+  "title": "Verify Documents Task Output Schema",
+  "description": "Output from the document verification task including OCR, biometric validation, and identity verification results",
+  "type": "object",
+  "required": [
+    "taskId",
+    "applicationId",
+    "completedTimestamp",
+    "documentsVerified",
+    "verificationResults"
+  ],
+  "properties": {
+    "taskId": {
+      "type": "string",
+      "description": "Unique identifier for this verification task instance",
+      "pattern": "^TASK-VERIFY-[0-9]{8}-[A-Z0-9]{6}$"
+    },
+    "applicationId": {
+      "type": "string",
+      "description": "Reference to the parent application ID",
+      "pattern": "^APP-[0-9]{8}-[A-Z0-9]{6}$"
+    },
+    "completedTimestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When verification was completed"
+    },
+    "documentsVerified": {
+      "type": "boolean",
+      "description": "Overall verification result - true if all documents pass, false otherwise"
+    },
+    "overallConfidenceScore": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Overall confidence score for verification (0-100)"
+    },
+    "verificationResults": {
+      "type": "array",
+      "description": "Detailed results for each document verified",
+      "items": {
+        "$ref": "#/definitions/documentVerification"
+      },
+      "minItems": 1
+    },
+    "biometricChecks": {
+      "type": "object",
+      "description": "Biometric verification results if applicable",
+      "properties": {
+        "faceMatch": {
+          "type": "object",
+          "properties": {
+            "performed": {
+              "type": "boolean"
+            },
+            "passed": {
+              "type": "boolean"
+            },
+            "confidenceScore": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "livenessCheckPassed": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "identityVerificationProvider": {
+      "type": "string",
+      "description": "Third-party identity verification provider used",
+      "examples": ["Onfido", "Jumio", "Trulioo", "Ingo Money"]
+    },
+    "verificationMethod": {
+      "type": "string",
+      "enum": ["automated", "manual-review", "hybrid"],
+      "description": "Method used for verification"
+    },
+    "failureReasons": {
+      "type": "array",
+      "description": "Reasons for verification failure if documentsVerified is false",
+      "items": {
+        "type": "string"
+      }
+    },
+    "extractedData": {
+      "type": "object",
+      "description": "Data extracted from documents via OCR",
+      "properties": {
+        "fullName": {
+          "type": "string"
+        },
+        "dateOfBirth": {
+          "type": "string",
+          "format": "date"
+        },
+        "documentNumber": {
+          "type": "string"
+        },
+        "nationality": {
+          "type": "string"
+        },
+        "expiryDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "address": {
+          "type": "string"
+        }
+      }
+    },
+    "dataConsistencyCheck": {
+      "type": "object",
+      "description": "Comparison of extracted data against submitted application data",
+      "properties": {
+        "nameMatch": {
+          "type": "boolean"
+        },
+        "dateOfBirthMatch": {
+          "type": "boolean"
+        },
+        "addressMatch": {
+          "type": "boolean"
+        },
+        "overallMatch": {
+          "type": "boolean"
+        },
+        "discrepancies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "processingDuration": {
+      "type": "number",
+      "description": "Time taken to complete verification in seconds"
+    },
+    "reviewRequired": {
+      "type": "boolean",
+      "description": "Whether manual review is recommended despite automated result"
+    },
+    "reviewReason": {
+      "type": "string",
+      "description": "Reason why manual review is recommended"
+    }
+  },
+  "definitions": {
+    "documentVerification": {
+      "type": "object",
+      "required": ["documentId", "documentType", "verificationStatus"],
+      "properties": {
+        "documentId": {
+          "type": "string",
+          "description": "Reference to uploaded document"
+        },
+        "documentType": {
+          "type": "string",
+          "enum": [
+            "passport",
+            "driving-licence",
+            "national-id-card",
+            "proof-of-address-utility",
+            "proof-of-address-bank",
+            "articles-of-incorporation",
+            "certificate-of-incumbency",
+            "memorandum-of-association",
+            "shareholder-register",
+            "proof-of-address-commercial"
+          ],
+          "description": "Type of document"
+        },
+        "verificationStatus": {
+          "type": "string",
+          "enum": ["verified", "failed", "manual-review-required"],
+          "description": "Verification outcome for this document"
+        },
+        "confidenceScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Confidence score for this document's verification"
+        },
+        "checks": {
+          "type": "object",
+          "description": "Individual checks performed on document",
+          "properties": {
+            "documentAuthenticity": {
+              "type": "object",
+              "properties": {
+                "passed": {
+                  "type": "boolean"
+                },
+                "score": {
+                  "type": "number"
+                }
+              }
+            },
+            "visualAuthenticity": {
+              "type": "object",
+              "properties": {
+                "passed": {
+                  "type": "boolean"
+                },
+                "score": {
+                  "type": "number"
+                }
+              }
+            },
+            "ocrReadability": {
+              "type": "object",
+              "properties": {
+                "passed": {
+                  "type": "boolean"
+                },
+                "score": {
+                  "type": "number"
+                }
+              }
+            },
+            "imageQuality": {
+              "type": "object",
+              "properties": {
+                "passed": {
+                  "type": "boolean"
+                },
+                "score": {
+                  "type": "number"
+                }
+              }
+            },
+            "documentExpiry": {
+              "type": "object",
+              "properties": {
+                "passed": {
+                  "type": "boolean"
+                },
+                "expiryDate": {
+                  "type": "string",
+                  "format": "date"
+                }
+              }
+            },
+            "securityFeatures": {
+              "type": "object",
+              "properties": {
+                "passed": {
+                  "type": "boolean"
+                },
+                "featuresDetected": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "issueDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "expiryDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "issuingCountry": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "warningsDetected": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "processingNotes": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

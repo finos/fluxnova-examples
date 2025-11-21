@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://finos.org/schemas/trade/risk/process-input.schema.json",
+  "title": "Trade Risk Process Input Schema",
+  "description": "Schema for data required to initiate the Speculative Risk Calculation workflow",
+  "type": "object",
+  "required": [
+    "tradeId",
+    "instrument",
+    "quantity",
+    "price",
+    "currency",
+    "traderId"
+  ],
+  "properties": {
+    "tradeId": {
+      "type": "string",
+      "description": "Unique identifier for the trade being analyzed.",
+      "pattern": "^TRADE-[0-9]{8}-[A-Z0-9]{6}$"
+    },
+    "instrument": {
+      "type": "object",
+      "description": "Details of the financial instrument being traded.",
+      "required": ["instrumentId", "instrumentType"],
+      "properties": {
+        "instrumentId": {
+          "type": "string",
+          "description": "Unique identifier for the instrument (e.g., ISIN, CUSIP)."
+        },
+        "instrumentType": {
+          "type": "string",
+          "enum": ["equity", "bond", "derivative"]
+        },
+        "ticker": {
+          "type": "string",
+          "description": "Ticker symbol of the instrument."
+        }
+      }
+    },
+    "quantity": {
+      "type": "number",
+      "description": "The quantity of the instrument being traded."
+    },
+    "price": {
+      "type": "number",
+      "description": "The price at which the trade is being executed."
+    },
+    "currency": {
+      "type": "string",
+      "description": "The currency of the trade.",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "traderId": {
+      "type": "string",
+      "description": "The ID of the trader who executed the trade."
+    }
+  }
+}

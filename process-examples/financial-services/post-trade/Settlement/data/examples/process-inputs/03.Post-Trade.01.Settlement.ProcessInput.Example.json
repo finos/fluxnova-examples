@@ -1,0 +1,28 @@
+{
+  "settlementId": "SETTLE-20251014-S1T2L3",
+  "tradeId": "TRADE-20251014-A1B2C3",
+  "instrument": {
+    "instrumentId": "US0378331005",
+    "instrumentType": "equity"
+  },
+  "quantity": 1000,
+  "price": 175.25,
+  "currency": "USD",
+  "settlementDate": "2025-10-16",
+  "counterparties": [
+    {
+      "counterpartyId": "CUST-001",
+      "settlementInstructions": {
+        "agent": "DTC",
+        "account": "123456789"
+      }
+    },
+    {
+      "counterpartyId": "BROKER-002",
+      "settlementInstructions": {
+        "agent": "Euroclear",
+        "account": "987654321"
+      }
+    }
+  ]
+}
