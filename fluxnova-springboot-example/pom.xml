@@ -5,11 +5,11 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.finos.fluxnova</groupId>
   <artifactId>fluxnova-springboot-example</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <fluxnova.version>1.0.0-SNAPSHOT</fluxnova.version>
+    <fluxnova.version>1.0.0</fluxnova.version>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
     <dd.version>1.51.0</dd.version>
@@ -227,46 +227,27 @@
 
   <repositories>
     <repository>
-      <id>fluxnova-bpm-platform</id>
-      <url>https://maven.pkg.github.com/finos/fluxnova-bpm-platform</url>
-      <snapshots>
+      <id>central</id>
+      <name>Maven Central Repository</name>
+      <url>https://repo.maven.apache.org/maven2</url>
+      <releases>
         <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
       </snapshots>
     </repository>
     <repository>
-      <id>fluxnova-feel-scala</id>
-      <url>https://maven.pkg.github.com/finos/fluxnova-feel-scala</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>fluxnova-bpm-release-parent</id>
-      <url>https://maven.pkg.github.com/finos/fluxnova-bpm-release-parent</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>fluxnova-release-parent</id>
-      <url>https://maven.pkg.github.com/finos/fluxnova-release-parent</url>
+      <id>ossrh-snapshots</id>
+      <name>Sonatype OSSRH Snapshots</name>
+      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
     </repository>
   </repositories>
-
-  <distributionManagement>
-    <repository>
-      <id>fluxnova-examples</id>
-      <name>GitHub Fluxnova Examples Maven Package</name>
-      <url>https://maven.pkg.github.com/finos/fluxnova-examples</url>
-    </repository>
-    <snapshotRepository>
-      <id>fluxnova-examples</id>
-      <name>GitHub Fluxnova Examples Maven Package</name>
-      <url>https://maven.pkg.github.com/finos/fluxnova-examples</url>
-    </snapshotRepository>
-  </distributionManagement>
 
 </project>
