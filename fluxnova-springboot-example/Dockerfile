@@ -15,7 +15,7 @@ FROM amazoncorretto:21.0.10
 WORKDIR /fluxnova
 
 # Install packages
-RUN yum install -y jq curl shadow-utils
+RUN yum install -y jq curl shadow-utils telnet postgresql
 
 # Create user and provide access to fluxnova folder
 RUN groupadd -g 4001 fluxnova_group && adduser -G fluxnova_group -u 4001 -m -d /fluxnova fluxnova_user

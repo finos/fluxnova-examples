@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - main
+      - feat/more-yum-on-dockerfile
   pull_request:
   workflow_dispatch:
 
@@ -33,5 +34,5 @@ jobs:
         run: mvn clean install -f fluxnova-springboot-example/pom.xml
 
       - name: Build and publish Docker image
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feat/more-yum-on-dockerfile'
         uses: ./.github/actions/build-publish-image
