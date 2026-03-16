@@ -1,13 +1,13 @@
 name: Build and Publish Docker Image
 
 env:
-  GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  DOCKER_USERNAME: finos
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
 on:
   push:
     branches:
-      - main
-  pull_request:
+      - 'release/**'
   workflow_dispatch:
 
 jobs:
@@ -32,6 +32,21 @@ jobs:
       - name: Build with Maven
         run: mvn clean install -f fluxnova-springboot-example/pom.xml
 
+      - name: Extract version from branch
+        id: version
+        run: |
+          if [[ "${{ github.ref }}" == refs/heads/release/* ]]; then
+            VERSION="${GITHUB_REF#refs/heads/release/}"
+            echo "release_tag=${VERSION}" >> $GITHUB_OUTPUT
+          else
+            echo "Error: This workflow must be run from a release/* branch"
+            exit 1
+          fi
+
       - name: Build and publish Docker image
-        if: github.ref == 'refs/heads/main'
         uses: ./.github/actions/build-publish-image
+        with:
+          image_name: finos/fluxnova-bpm-platform
+          dockerfile_path: fluxnova-springboot-example/Dockerfile
+          docker_context: .
+          release_tag: ${{ steps.version.outputs.release_tag }}
