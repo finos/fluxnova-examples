@@ -53,13 +53,13 @@ By default, the application uses an H2 database. All Spring Boot configurations 
 1. **Pull the Docker image:**
 
    ```sh
-   docker pull ghcr.io/finos/fluxnova-examples:1.0.0-snapshot
+   docker pull finos/fluxnova-examples:1.0.0
    ```
 
 2. **Run the Docker image with host port 8080:**
 
    ```sh
-   docker run -p 8080:8080 ghcr.io/finos/fluxnova-examples:1.0.0-snapshot
+   docker run -p 8080:8080 finos/fluxnova-examples:1.0.0
    ```
 
 3. **Database Configuration:**
@@ -87,7 +87,7 @@ By default, the application uses an H2 database. All Spring Boot configurations 
      -e DB_PASSWORD=<password> \
      -e FLUXNOVA_BPM_ADMIN_USER_ID=demo \
      -e FLUXNOVA_BPM_ADMIN_USER_PASSWORD=demo \
-     ghcr.io/finos/fluxnova-examples:1.0.0-snapshot
+     finos/fluxnova-examples:1.0.0
    ```
 
    Here, `FLUXNOVA_BPM_ADMIN_USER_ID` and `FLUXNOVA_BPM_ADMIN_USER_PASSWORD` override the default admin user credentials (`fluxnova.bpm.admin-user.id` and `fluxnova.bpm.admin-user.password`) in the application.
