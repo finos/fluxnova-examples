@@ -1,4 +1,4 @@
-FROM amazoncorretto:21.0.10 AS builder
+FROM amazoncorretto:25.0.2 AS builder
 
 # Setup required env variables
 ENV JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto \
@@ -10,7 +10,7 @@ WORKDIR /app
 COPY fluxnova-springboot-example/target/fluxnova-springboot-example-*.jar fluxnova.jar
 
 # Final minimal image
-FROM amazoncorretto:21.0.10
+FROM amazoncorretto:25.0.2
 
 WORKDIR /fluxnova
 
