@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:fluxnova="http://fluxnova.finos.org/schema/1.0/bpmn" xmlns:modeler="http://fluxnova.finos.org/schema/modeler/1.0" id="Definitions_1qi27d6" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Fluxnova Modeler" exporterVersion="1.1.1-dev" modeler:executionPlatform="Fluxnova Platform" modeler:executionPlatformVersion="1.0.0">
+  <bpmn:process id="llm_invocation" name="llm_invocation" isExecutable="true" camunda:historyTimeToLive="30">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_02da6ba</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_02da6ba" sourceRef="StartEvent_1" targetRef="Activity_1divg7x" />
+    <bpmn:serviceTask id="Activity_0bi2r8e" name="Invoke LLM in MCP-Client" camunda:expression=" ${execution.setVariable(&#34;response&#34;, chatService.chat(execution.getVariable(&#34;prompt&#34;)))}">
+      <bpmn:incoming>Flow_0kwbxxl</bpmn:incoming>
+      <bpmn:outgoing>Flow_17yphwd</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_17yphwd" sourceRef="Activity_0bi2r8e" targetRef="Activity_0uke0r8" />
+    <bpmn:userTask id="Activity_0uke0r8" name="Review">
+      <bpmn:incoming>Flow_17yphwd</bpmn:incoming>
+      <bpmn:outgoing>Flow_1n7uob2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="Event_07remtq">
+      <bpmn:incoming>Flow_1n7uob2</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1n7uob2" sourceRef="Activity_0uke0r8" targetRef="Event_07remtq" />
+    <bpmn:sequenceFlow id="Flow_1c46vz9" sourceRef="Activity_1divg7x" targetRef="Activity_09cunxj" />
+    <bpmn:sequenceFlow id="Flow_0kwbxxl" sourceRef="Activity_09cunxj" targetRef="Activity_0bi2r8e" />
+    <bpmn:scriptTask id="Activity_1divg7x" name="Assign Business Key" scriptFormat="javascript">
+      <bpmn:incoming>Flow_02da6ba</bpmn:incoming>
+      <bpmn:outgoing>Flow_1c46vz9</bpmn:outgoing>
+      <bpmn:script>execution.setProcessBusinessKey(java.util.UUID.randomUUID().toString())</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:scriptTask id="Activity_09cunxj" name="Inject Business Key into Prompt" scriptFormat="javascript">
+      <bpmn:incoming>Flow_1c46vz9</bpmn:incoming>
+      <bpmn:outgoing>Flow_0kwbxxl</bpmn:outgoing>
+      <bpmn:script>execution.setVariable("prompt", execution.getVariable("prompt").concat(" businessKey is ").concat(execution.getBusinessKey()))</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="llm_invocation">
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="182" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0gexneq_di" bpmnElement="Activity_0bi2r8e">
+        <dc:Bounds x="590" y="80" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_13wv5yc_di" bpmnElement="Activity_0uke0r8">
+        <dc:Bounds x="750" y="80" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_07remtq_di" bpmnElement="Event_07remtq">
+        <dc:Bounds x="912" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_18d22w5_di" bpmnElement="Activity_1divg7x">
+        <dc:Bounds x="270" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0kvxe1h_di" bpmnElement="Activity_09cunxj">
+        <dc:Bounds x="430" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_02da6ba_di" bpmnElement="Flow_02da6ba">
+        <di:waypoint x="218" y="120" />
+        <di:waypoint x="270" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17yphwd_di" bpmnElement="Flow_17yphwd">
+        <di:waypoint x="690" y="120" />
+        <di:waypoint x="750" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1n7uob2_di" bpmnElement="Flow_1n7uob2">
+        <di:waypoint x="850" y="120" />
+        <di:waypoint x="912" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1c46vz9_di" bpmnElement="Flow_1c46vz9">
+        <di:waypoint x="370" y="120" />
+        <di:waypoint x="430" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kwbxxl_di" bpmnElement="Flow_0kwbxxl">
+        <di:waypoint x="530" y="120" />
+        <di:waypoint x="590" y="120" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

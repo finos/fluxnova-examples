@@ -1,0 +1,26 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: mcp-client
+  ai:
+    mcp:
+      client:
+        name: mcp-client
+        version: 0.1.1
+        toolcallback:
+          enabled: true
+        streamable-http:
+          connections:
+            fluxnova-service:
+              url: ${FLUXNOVA_SERVICE_URL:http://mcp-tools-fluxnova:8080}/mcp
+    ollama:
+      base-url: ${OLLAMA_BASE_URL:http://ollama:11434}
+      chat:
+        model: qwen3:0.6b
+logging:
+  level:
+    org:
+      finos:
+        fluxnova:
+          example: DEBUG

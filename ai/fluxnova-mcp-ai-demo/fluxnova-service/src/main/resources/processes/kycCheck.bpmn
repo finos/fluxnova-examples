@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:mcp="http://fluxnova.finos.org/schema/1.0/ai/mcp" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:fluxnova="http://fluxnova.finos.org/schema/1.0/bpmn" xmlns:modeler="http://fluxnova.finos.org/schema/modeler/1.0" id="Definitions_1ahcf78" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Fluxnova Modeler" exporterVersion="1.1.1-dev" modeler:executionPlatform="Fluxnova Platform" modeler:executionPlatformVersion="1.0.0">
+  <bpmn:process id="kycCheck" name="kycCheck" isExecutable="true" camunda:historyTimeToLive="30">
+    <bpmn:startEvent id="StartEvent_1" mcp:type="mcpToolStart" mcp:toolName="KYC Check" mcp:description="Initiate KYC for a specific customer" mcp:propagateBusinessKey="false">
+      <bpmn:extensionElements>
+        <mcp:parameters>
+          <mcp:parameter paramName="customerName" paramType="String" />
+        </mcp:parameters>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_0wmq7op</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0wmq7op" sourceRef="StartEvent_1" targetRef="Activity_16jli4b" />
+    <bpmn:userTask id="Activity_16jli4b">
+      <bpmn:incoming>Flow_0wmq7op</bpmn:incoming>
+      <bpmn:outgoing>Flow_1r3j2sv</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="Event_0f3be1m">
+      <bpmn:incoming>Flow_1r3j2sv</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1r3j2sv" sourceRef="Activity_16jli4b" targetRef="Event_0f3be1m" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="kycCheck">
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="182" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1yka4no_di" bpmnElement="Activity_16jli4b">
+        <dc:Bounds x="270" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0f3be1m_di" bpmnElement="Event_0f3be1m">
+        <dc:Bounds x="422" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0wmq7op_di" bpmnElement="Flow_0wmq7op">
+        <di:waypoint x="218" y="120" />
+        <di:waypoint x="270" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1r3j2sv_di" bpmnElement="Flow_1r3j2sv">
+        <di:waypoint x="370" y="120" />
+        <di:waypoint x="422" y="120" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
