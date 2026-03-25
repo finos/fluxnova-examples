@@ -9,7 +9,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <fluxnova.version>1.0.0</fluxnova.version>
+    <fluxnova.version>1.1.0</fluxnova.version>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
     <dd.version>1.51.0</dd.version>
