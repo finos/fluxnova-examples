@@ -16,7 +16,7 @@
     <logback-encoder.version>8.1</logback-encoder.version>
     <json.version>20250517</json.version>
     <graalvm.version>23.0.5</graalvm.version>
-    <codenarc.version>3.5.0-groovy-4.0</codenarc.version>
+    <codenarc.version>3.7.0-groovy-4.0</codenarc.version>
     <httpclient.version>4.5.14</httpclient.version>
   </properties>
 
