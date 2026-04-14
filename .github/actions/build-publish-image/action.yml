@@ -36,7 +36,7 @@ runs:
         echo "tags=${{ inputs.image_name }}:${{ inputs.release_tag }},${{ inputs.image_name }}:latest" >> $GITHUB_OUTPUT
 
     - name: Build and Push Docker Image
-      uses: docker/build-push-action@v6
+      uses: docker/build-push-action@v7
       with:
         context: ${{ inputs.docker_context }}
         file: ${{ inputs.dockerfile_path }}
