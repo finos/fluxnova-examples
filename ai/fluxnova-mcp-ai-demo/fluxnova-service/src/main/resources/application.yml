@@ -1,0 +1,60 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: fluxnova-service
+  datasource:
+    url: jdbc:h2:file:/data/h2/fluxnova-db;AUTO_SERVER=TRUE;AUTO_SERVER_PORT=0;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  ai:
+    mcp:
+      server:
+        name: fluxnova-service
+        version: 0.1.1
+        protocol: streamable
+        stdio: false
+        type: sync
+
+fluxnova:
+  bpm:  
+    auto-deployment-enabled: true
+    deployment-resource-pattern: classpath*:**/*.bpmn,classpath*:**/*.dmn
+    admin-user:
+      id: demo
+      password: demo
+      firstName: Demo
+      lastName: User
+    filter:
+      create: All tasks
+    database:
+      type: h2
+      schema-update: true
+    webapp:
+      index-redirect-enabled: true
+    job-execution:
+      enabled: true
+    metrics:
+      enabled: false
+    generic-properties:
+      properties:
+        historyTimeToLive: "180"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    org:
+      finos:
+        fluxnova:
+          example: DEBUG

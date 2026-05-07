@@ -1,0 +1,7 @@
+### invoke LLM via mcp-client
+GET http://localhost:8083/chat?prompt=perform%20kyc%20check%20for%20customer%20Foo%20Bar
+### Start a BPMN Process Instance
+POST http://localhost:8084/engine-rest/process-definition/key/llm_invocation/start
+Content-Type: application/json
+
+{"variables":{"prompt":{"value":"Perform transaction history scanning for Foo Bar for 2025","type":"String"}}}

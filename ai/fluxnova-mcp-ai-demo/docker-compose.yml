@@ -1,0 +1,80 @@
+services:
+  mcp-client:
+    build:
+      context: .
+      dockerfile: mcp-client/Dockerfile
+    depends_on:
+      fluxnova-service:
+        condition: service_healthy
+    container_name: mcp-client
+    ports:
+      - "8083:8080"
+      - "5007:5005"
+    restart: on-failure
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - FLUXNOVA_SERVICE_URL=http://fluxnova-service:8084
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - microservices-network
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        ollama serve &
+        sleep 5
+        ollama pull qwen3:0.6b || true
+        wait
+    healthcheck:
+      test: ["CMD", "/bin/sh", "-c", "ollama list | grep -q '^qwen3:0.6b'"]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+    networks:
+      - microservices-network
+
+  fluxnova-service:
+    build:
+      context: .
+      dockerfile: fluxnova-service/Dockerfile
+    container_name: fluxnova-service
+    ports:
+      - "8084:8084"
+      - "5008:5005"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+    volumes:
+      - fluxnova_h2:/data/h2
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8084/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge
+
+volumes:
+  ollama_data:
+    driver: local
+  fluxnova_h2:
+    driver: local

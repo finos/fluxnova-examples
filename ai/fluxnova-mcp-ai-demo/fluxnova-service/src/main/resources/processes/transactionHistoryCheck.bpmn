@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:mcp="http://fluxnova.finos.org/schema/1.0/ai/mcp" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:fluxnova="http://fluxnova.finos.org/schema/1.0/bpmn" xmlns:modeler="http://fluxnova.finos.org/schema/modeler/1.0" id="Definitions_0y36ysc" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Fluxnova Modeler" exporterVersion="1.1.1-dev" modeler:executionPlatform="Fluxnova Platform" modeler:executionPlatformVersion="1.0.0">
+  <bpmn:process id="transactionHistoryCheck" name="Transaction History Check" isExecutable="true" camunda:historyTimeToLive="30">
+    <bpmn:startEvent id="StartEvent_1" mcp:type="mcpToolStart" mcp:toolName="Transaction History Check" mcp:description="Checks the transaction history for a specific customer">
+      <bpmn:extensionElements>
+        <mcp:parameters>
+          <mcp:parameter paramName="customerName" paramType="String" />
+          <mcp:parameter paramName="startDate" paramType="Date" />
+          <mcp:parameter paramName="endDate" paramType="Date" />
+        </mcp:parameters>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_0reufx6</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0reufx6" sourceRef="StartEvent_1" targetRef="Activity_0nhflfp" />
+    <bpmn:userTask id="Activity_0nhflfp">
+      <bpmn:incoming>Flow_0reufx6</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ul4flm</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="Event_0t3a1t9">
+      <bpmn:incoming>Flow_0ul4flm</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0ul4flm" sourceRef="Activity_0nhflfp" targetRef="Event_0t3a1t9" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="transactionHistoryCheck">
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="182" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1sdwv4g_di" bpmnElement="Activity_0nhflfp">
+        <dc:Bounds x="270" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0t3a1t9_di" bpmnElement="Event_0t3a1t9">
+        <dc:Bounds x="422" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0reufx6_di" bpmnElement="Flow_0reufx6">
+        <di:waypoint x="218" y="120" />
+        <di:waypoint x="270" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ul4flm_di" bpmnElement="Flow_0ul4flm">
+        <di:waypoint x="370" y="120" />
+        <di:waypoint x="422" y="120" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
