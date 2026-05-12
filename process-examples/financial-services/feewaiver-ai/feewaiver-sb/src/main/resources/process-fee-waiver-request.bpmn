@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:fluxnova="http://fluxnova.finos.org/schema/1.0/bpmn" xmlns:modeler="http://fluxnova.finos.org/schema/modeler/1.0" id="Definitions_1p27ygz" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Fluxnova Modeler" exporterVersion="1.1.1-dev" modeler:executionPlatform="Fluxnova Platform" modeler:executionPlatformVersion="1.0.0">
+  <bpmn:process id="process-fee-waiver-request" name="Process Fee Waiver Request" isExecutable="true" camunda:historyTimeToLive="30">
+    <bpmn:startEvent id="start-event" name="Fee Waiver Request Processing Required">
+      <bpmn:outgoing>Flow_1krz2y0</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="svc-analyze-case" name="LLM Case Analysis" camunda:asyncBefore="true" camunda:delegateExpression="${llmCaseAnalysisDelegate}">
+      <bpmn:incoming>Flow_1krz2y0</bpmn:incoming>
+      <bpmn:outgoing>Flow_11d0ro1</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1krz2y0" sourceRef="start-event" targetRef="svc-analyze-case" />
+    <bpmn:exclusiveGateway id="gw-policy-route" name="Policy Route?">
+      <bpmn:incoming>Flow_0d9su7m</bpmn:incoming>
+      <bpmn:outgoing>Flow_0dchcmq</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1ru6m9x</bpmn:outgoing>
+      <bpmn:outgoing>Flow_14wf3k0</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_11d0ro1" sourceRef="svc-analyze-case" targetRef="svc-apply-guardrail" />
+    <bpmn:endEvent id="end-event-autoapprove" name="Fee Waiver Request Automatically Approved">
+      <bpmn:incoming>Flow_0dchcmq</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0dchcmq" name="Auto Approved" sourceRef="gw-policy-route" targetRef="end-event-autoapprove">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${policyRoute == "AUTO_PROCESS"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="end-event-escalated" name="Fee Waiver Request Escalated">
+      <bpmn:incoming>Flow_1ru6m9x</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1ru6m9x" name="Escalated" sourceRef="gw-policy-route" targetRef="end-event-escalated">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${policyRoute == "ESCALATE"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_14wf3k0" name="Human Review Required" sourceRef="gw-policy-route" targetRef="usr-review-case">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${policyRoute == "HUMAN_REVIEW"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:userTask id="usr-review-case" name="Review Case" camunda:asyncAfter="true" camunda:formKey="embedded:app:forms/review-case.html" camunda:assignee="demo">
+      <bpmn:extensionElements>
+        <camunda:taskListener event="complete" id="completeListener">
+          <camunda:script scriptFormat="javascript">var reviewer = task.getAssignee();
+task.getExecution().setVariable('reviewer', reviewer);
+
+var taskDecision = task.getVariable('taskDecision');
+var reviewDecision;
+if(taskDecision)
+  reviewDecision = "APPROVE";
+else
+  reviewDecision = "REJECT";
+
+task.getExecution().setVariable('reviewDecision', reviewDecision);</camunda:script>
+        </camunda:taskListener>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_14wf3k0</bpmn:incoming>
+      <bpmn:outgoing>Flow_0fvum80</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0fvum80" sourceRef="usr-review-case" targetRef="svc-submit-review" />
+    <bpmn:serviceTask id="svc-submit-review" name="Submit Review" camunda:asyncBefore="true" camunda:delegateExpression="${submitReviewDelegate}">
+      <bpmn:incoming>Flow_0fvum80</bpmn:incoming>
+      <bpmn:outgoing>Flow_1nqgzxi</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="end-event-manual-review" name="Fee Waiver Request Processed">
+      <bpmn:incoming>Flow_1nqgzxi</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1nqgzxi" sourceRef="svc-submit-review" targetRef="end-event-manual-review" />
+    <bpmn:subProcess id="Activity_1nm1zz5" triggeredByEvent="true">
+      <bpmn:serviceTask id="svc-fee-waiver-history-tool" name="Fee Waiver History Tool Action" camunda:delegateExpression="${feeWaiverHistoryDelegate}">
+        <bpmn:incoming>Flow_0jjorxc</bpmn:incoming>
+        <bpmn:outgoing>Flow_0ffxbqz</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sequenceFlow id="Flow_0jjorxc" sourceRef="start-ni-fee-waiver-history-tool" targetRef="svc-fee-waiver-history-tool" />
+      <bpmn:endEvent id="end-fee-waiver-history-tool" name="Fee Waiver History Tool Completed">
+        <bpmn:incoming>Flow_0ffxbqz</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_0ffxbqz" sourceRef="svc-fee-waiver-history-tool" targetRef="end-fee-waiver-history-tool" />
+      <bpmn:startEvent id="start-ni-fee-waiver-history-tool" name="Fee Waiver History Tool Requested" isInterrupting="false">
+        <bpmn:outgoing>Flow_0jjorxc</bpmn:outgoing>
+        <bpmn:conditionalEventDefinition id="ConditionalEventDefinition_05w9ovm" camunda:variableName="toolConversationOccurred">
+          <bpmn:condition xsi:type="bpmn:tFormalExpression">${toolConversationOccurred == true}</bpmn:condition>
+        </bpmn:conditionalEventDefinition>
+      </bpmn:startEvent>
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="Flow_0d9su7m" sourceRef="svc-apply-guardrail" targetRef="gw-policy-route" />
+    <bpmn:businessRuleTask id="svc-apply-guardrail" name="Apply Guardrail" camunda:delegateExpression="${finalGuardrailDelegate}">
+      <bpmn:incoming>Flow_11d0ro1</bpmn:incoming>
+      <bpmn:outgoing>Flow_0d9su7m</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:textAnnotation id="TextAnnotation_1k2034u">
+      <bpmn:text>Required Inputs:
+
+1) requestText
+2) priorFeeWaiverCount
+3) feeAmount
+4) vulnerableCustomer
+5) regulatorySensitivity</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_1324rhv" associationDirection="None" sourceRef="start-event" targetRef="TextAnnotation_1k2034u" />
+    <bpmn:textAnnotation id="TextAnnotation_0f9ouhu">
+      <bpmn:text>Provided:
+
+1) reviewDecision
+2) reviewNotes</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_06qsrl4" associationDirection="None" sourceRef="usr-review-case" targetRef="TextAnnotation_0f9ouhu" />
+    <bpmn:textAnnotation id="TextAnnotation_0ir3kmq">
+      <bpmn:text>Returned:
+
+1) entityId
+2) policyRoute
+3) finalAction
+4) requiresHumanReview</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_1yv8nk7" associationDirection="None" sourceRef="svc-analyze-case" targetRef="TextAnnotation_0ir3kmq" />
+    <bpmn:textAnnotation id="TextAnnotation_1ntky5u">
+      <bpmn:text>Contains embedded guardrails using rules (with Drools Expert).</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_02jdmny" associationDirection="None" sourceRef="svc-analyze-case" targetRef="TextAnnotation_1ntky5u" />
+    <bpmn:textAnnotation id="TextAnnotation_0jmy265">
+      <bpmn:text>Uses Drools Expert to apply a final guardrail before routing.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_0aikqv2" associationDirection="None" sourceRef="svc-apply-guardrail" targetRef="TextAnnotation_0jmy265" />
+  </bpmn:process>
+  <bpmn:message id="Message_347e0v3" name="AI_TOOL_REQUESTED" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="process-fee-waiver-request">
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="start-event">
+        <dc:Bounds x="192" y="242" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="182" y="285" width="57" height="53" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_07nwt6f_di" bpmnElement="svc-analyze-case">
+        <dc:Bounds x="300" y="220" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0opc5us_di" bpmnElement="gw-policy-route" isMarkerVisible="true">
+        <dc:Bounds x="625" y="235" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="666" y="233" width="68" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1dly8vo_di" bpmnElement="usr-review-case">
+        <dc:Bounds x="790" y="220" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1m0c6r7_di" bpmnElement="svc-submit-review">
+        <dc:Bounds x="940" y="220" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1mf01s6_di" bpmnElement="end-event-manual-review">
+        <dc:Bounds x="1102" y="242" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1092" y="285" width="57" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0s9hiio_di" bpmnElement="svc-apply-guardrail">
+        <dc:Bounds x="460" y="220" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0urxy6h_di" bpmnElement="end-event-autoapprove">
+        <dc:Bounds x="822" y="92" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="807" y="135" width="66" height="53" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1hh7pv3_di" bpmnElement="end-event-escalated">
+        <dc:Bounds x="822" y="382" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="812" y="425" width="57" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_00dsypw_di" bpmnElement="Activity_1nm1zz5" isExpanded="true">
+        <dc:Bounds x="350" y="560" width="390" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0usa3ye_di" bpmnElement="svc-fee-waiver-history-tool">
+        <dc:Bounds x="500" y="620" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1u77df0_di" bpmnElement="end-fee-waiver-history-tool">
+        <dc:Bounds x="662" y="642" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="651" y="685" width="58" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1jppx9j_di" bpmnElement="start-ni-fee-waiver-history-tool">
+        <dc:Bounds x="390" y="642" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="379" y="685" width="58" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0jjorxc_di" bpmnElement="Flow_0jjorxc">
+        <di:waypoint x="426" y="660" />
+        <di:waypoint x="500" y="660" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ffxbqz_di" bpmnElement="Flow_0ffxbqz">
+        <di:waypoint x="600" y="660" />
+        <di:waypoint x="662" y="660" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_1yv8nk7_di" bpmnElement="Association_1yv8nk7">
+        <di:waypoint x="343" y="300" />
+        <di:waypoint x="323" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_02jdmny_di" bpmnElement="Association_02jdmny">
+        <di:waypoint x="362" y="220" />
+        <di:waypoint x="379" y="164" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_06qsrl4_di" bpmnElement="Association_06qsrl4">
+        <di:waypoint x="870" y="300" />
+        <di:waypoint x="993" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_0aikqv2_di" bpmnElement="Association_0aikqv2">
+        <di:waypoint x="527" y="300" />
+        <di:waypoint x="574" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_1324rhv_di" bpmnElement="Association_1324rhv">
+        <di:waypoint x="210" y="242" />
+        <di:waypoint x="210" y="203" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_0f9ouhu_di" bpmnElement="TextAnnotation_0f9ouhu">
+        <dc:Bounds x="960" y="410" width="135" height="70" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0ir3kmq_di" bpmnElement="TextAnnotation_0ir3kmq">
+        <dc:Bounds x="270" y="410" width="160" height="110" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0jmy265_di" bpmnElement="TextAnnotation_0jmy265">
+        <dc:Bounds x="530" y="410" width="100" height="70" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_1ntky5u_di" bpmnElement="TextAnnotation_1ntky5u">
+        <dc:Bounds x="340" y="100" width="150" height="64" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1krz2y0_di" bpmnElement="Flow_1krz2y0">
+        <di:waypoint x="228" y="260" />
+        <di:waypoint x="300" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11d0ro1_di" bpmnElement="Flow_11d0ro1">
+        <di:waypoint x="400" y="260" />
+        <di:waypoint x="460" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0d9su7m_di" bpmnElement="Flow_0d9su7m">
+        <di:waypoint x="560" y="260" />
+        <di:waypoint x="625" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0dchcmq_di" bpmnElement="Flow_0dchcmq">
+        <di:waypoint x="650" y="235" />
+        <di:waypoint x="650" y="110" />
+        <di:waypoint x="822" y="110" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="563" y="147" width="73" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ru6m9x_di" bpmnElement="Flow_1ru6m9x">
+        <di:waypoint x="650" y="285" />
+        <di:waypoint x="650" y="400" />
+        <di:waypoint x="822" y="400" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="575" y="341" width="49" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14wf3k0_di" bpmnElement="Flow_14wf3k0">
+        <di:waypoint x="675" y="260" />
+        <di:waypoint x="790" y="260" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="692" y="266" width="75" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0fvum80_di" bpmnElement="Flow_0fvum80">
+        <di:waypoint x="890" y="260" />
+        <di:waypoint x="940" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1nqgzxi_di" bpmnElement="Flow_1nqgzxi">
+        <di:waypoint x="1040" y="260" />
+        <di:waypoint x="1102" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_1k2034u_di" bpmnElement="TextAnnotation_1k2034u">
+        <dc:Bounds x="153" y="90" width="147" height="113" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

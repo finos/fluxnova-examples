@@ -1,0 +1,15 @@
+package co.summit58.feewaiver.sb.rules;
+
+import co.summit58.feewaiver.sb.models.FinalGuardrailFacts;
+
+rule "Low-confidence auto-approvals must be reviewed"
+when
+    $f : FinalGuardrailFacts(
+        policyRoute == "AUTO_PROCESS",
+        aiConfidence < 0.85
+    )
+then
+    $f.setPolicyRoute("HUMAN_REVIEW");
+    $f.setFinalGuardrailOverride(true);
+    $f.setFinalGuardrailReason("DRL: Low-confidence auto-approvals must be reviewed.");
+end

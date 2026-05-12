@@ -1,0 +1,98 @@
+<form class="form-horizontal"
+      role="form">
+
+  <p>Please review this fee waiver request:</p>
+
+  <div class="form-group">
+    <label class="control-label col-md-2">Customer Request</label>
+    <div class="col-md-10">
+      <!--<input fxn-variable-name="requestText"
+             type="text"
+             name="requestText"
+             readonly="true"
+             class="form-control" />-->
+      <textarea fxn-variable-name="requestText"
+                type="text"
+                name="requestText"
+                readonly="true"
+                class="form-control"></textarea>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="control-label col-md-2">Fee Amount</label>
+    <div class="col-md-10">
+      <input fxn-variable-name="feeAmount"
+             fxn-variable-type="Long"
+             type="text"
+             name="feeAmount"
+             readonly="true"
+             class="form-control" />
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="control-label col-md-2">Prior Fee Waiver Request Count</label>
+    <div class="col-md-10">
+      <input fxn-variable-name="priorFeeWaiverCount"
+             fxn-variable-type="Long"
+             type="text"
+             name="priorFeeWaiverCount"
+             readonly="true"
+             class="form-control" />
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="control-label col-md-2">Vulnerable Customer?</label>
+    <div class="col-md-10">
+        <input fxn-variable-name="vulnerableCustomer"
+               fxn-variable-type="Boolean"
+               type="text"
+               name="vulnerableCustomer"
+               class="form-control" 
+               readonly="true" />
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="control-label col-md-2">Regulatory Sensitivity?</label>
+    <div class="col-md-10">
+        <input fxn-variable-name="regulatorySensitivity"
+               fxn-variable-type="Boolean"
+               type="text"
+               name="regulatorySensitivity"
+               class="form-control" 
+               readonly="true" />
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-md-10 col-md-offset-2">
+      <div class="checkbox">
+        <label>
+          <input fxn-variable-name="taskDecision"
+                 fxn-variable-type="Boolean"
+                 type="checkbox"
+                 name="taskDecision"
+                 class="form-control" />
+          Review Decision? (Check if Approved)
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="control-label col-md-2">Review Comments</label>
+    <div class="col-md-10">
+      <!--<input fxn-variable-name="reviewComments"
+             type="text"
+             name="reviewComments"
+             readonly="true"
+             class="form-control" />-->
+      <textarea fxn-variable-name="reviewComments"
+             fxn-variable-type="String"
+             type="text"
+             name="reviewComments"
+             class="form-control"></textarea>
+    </div>
+  </div>
+</form>

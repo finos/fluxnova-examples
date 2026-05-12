@@ -1,0 +1,33 @@
+package co.summit58.feewaiver.sb.rules;
+
+import co.summit58.feewaiver.sb.models.FeeWaiverFacts;
+
+rule "Regulatory sensitivity forces escalation"
+when
+    $f : FeeWaiverFacts(regulatorySensitivity == true)
+then
+    $f.setDrlEscalate(true);
+    $f.setDrlReason("DRL: Regulatory sensitivity requires escalation.");
+end
+
+rule "High amount and repeat requests require review"
+when
+    $f : FeeWaiverFacts(feeAmount >= 500, priorFeeWaiverCount >= 2, drlEscalate == false)
+then
+    $f.setDrlRequiresReview(true);
+    $f.setDrlReason("DRL: High amount with repeat requests requires human review.");
+end
+
+rule "Vulnerable customer with medium/high AI risk requires review"
+when
+    $f : FeeWaiverFacts(
+        vulnerableCustomer == true,
+        aiRiskLevel in ("MEDIUM", "HIGH"),
+        drlEscalate == false
+    )
+then
+    $f.setDrlRequiresReview(true);
+    if ($f.getDrlReason() == null) {
+        $f.setDrlReason("DRL: Vulnerable customer with elevated risk requires human review.");
+    }
+end
