@@ -1,0 +1,76 @@
+name: Update Version and Create PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (e.g. 1.0.0)"
+        required: true
+        type: string
+
+  repository_dispatch:
+    types: [update-version]
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Determine version input
+        id: vars
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${{ github.event.client_payload.version }}"
+          fi
+
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create release branch
+        run: |
+          BRANCH="release/${{ env.VERSION }}"
+          git checkout -b $BRANCH
+
+      - name: Update pom.xml
+        run: |
+          VERSION=${{ env.VERSION }}
+
+          echo "Updating versions to $VERSION"
+
+          # Update <version>
+          sed -i "0,/<version>.*<\/version>/s//<version>${VERSION}<\/version>/" pom.xml
+
+          # Update <fluxnova.version>
+          sed -i "s/<fluxnova.version>.*<\/fluxnova.version>/<fluxnova.version>${VERSION}<\/fluxnova.version>/" pom.xml
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+          git add pom.xml
+          git commit -m "Update version to ${{ env.VERSION }}"
+
+      - name: Push branch
+        run: |
+          git push origin release/${{ env.VERSION }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: release/${{ env.VERSION }}
+          title: "Release ${{ env.VERSION }}"
+          base: main
+          commit-message: "Update version to ${{ env.VERSION }}"
+          body: |
+            This PR updates:
+            - project version → ${{ env.VERSION }}
+            - fluxnova.version → ${{ env.VERSION }}
