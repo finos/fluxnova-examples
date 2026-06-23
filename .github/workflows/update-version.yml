@@ -1,3 +1,6 @@
+# Updates project and dependency versions, creates a release branch, and opens a PR.
+# Supports both manual trigger and repository_dispatch (API) with version input.
+
 name: Update Version and Create PR
 
 on:
