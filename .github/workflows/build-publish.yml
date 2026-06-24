@@ -44,7 +44,7 @@ jobs:
         if: startsWith(github.ref, 'refs/heads/release/')
         uses: ./.github/actions/build-publish-image
         with:
-          image_name: finos/fluxnova-bpm-platform
+          image_name: finos/fluxnova-springboot-demo
           dockerfile_path: fluxnova-springboot-example/Dockerfile
           docker_context: .
           release_tag: ${{ steps.version.outputs.release_tag }}
