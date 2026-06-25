@@ -60,18 +60,6 @@ jobs:
           echo "===== git diff ====="
           git diff
 
-      - name: Commit changes
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-
-          git add fluxnova-springboot-example/pom.xml
-          git commit -m "Update version to ${{ env.VERSION }}"
-
-      - name: Push branch
-        run: |
-          git push origin release/${{ env.VERSION }}
-
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
