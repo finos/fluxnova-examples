@@ -46,11 +46,14 @@ jobs:
 
           echo "Updating versions to $VERSION"
           mvn -f fluxnova-springboot-example/pom.xml versions:set \
-           -DnewVersion=$VERSION
+           -DnewVersion=$VERSION \
+           -DprocessAllModules=true \
+           -DgenerateBackupPoms=false
 
           mvn -f fluxnova-springboot-example/pom.xml versions:set-property \
             -Dproperty=fluxnova.version \
-            -DnewVersion=$VERSION
+            -DnewVersion=$VERSION \
+            -DgenerateBackupPoms=false
 
       - name: Verify changes
         run: |
