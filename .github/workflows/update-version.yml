@@ -35,10 +35,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create release branch
-        run: |
-          git checkout -b release/${{ env.VERSION }}
+          ref: main
 
       - name: Update pom.xml versions
         run: |
