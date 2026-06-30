@@ -1,0 +1,107 @@
+{
+  "info": {
+    "_postman_id": "c9dfbd45-e178-4e96-8b62-d4114ea2cc0e",
+    "name": "Fee Waiver REST Requests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "32554715",
+    "_collection_link": "https://go.postman.co/collection/32554715-c9dfbd45-e178-4e96-8b62-d4114ea2cc0e?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Start Process Fee Waiver Request Human Review",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"variables\": {\n\t\t\"requestText\": {\n\t\t\t\"value\": \"I need all $650 in overdraft and related fees reversed. This has happened multiple times because of issues with my account. Please fix it today.\",\n\t\t\t\"type\":\"String\"\n\t\t},\n\t\t\"priorFeeWaiverCount\": {\n\t\t\t\"value\": 3,\n\t\t\t\"type\":\"Long\"\n\t\t},\n\t\t\"feeAmount\": {\n\t\t\t\"value\": 650.0,\n\t\t\t\"type\":\"Double\"\n\t\t},\n\t\t\"vulnerableCustomer\": {\n\t\t\t\"value\": false,\n\t\t\t\"type\":\"Boolean\"\n\t\t},\n\t\t\"regulatorySensitivity\": {\n\t\t\t\"value\": false,\n\t\t\t\"type\":\"Boolean\"\n\t\t}\n\t},\n\t\"businessKey\":\"test1\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/engine-rest/process-definition/key/process-fee-waiver-request/start",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "engine-rest",
+            "process-definition",
+            "key",
+            "process-fee-waiver-request",
+            "start"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Start Process Fee Waiver Request Auto-Approval",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"variables\": {\n\t\t\"requestText\": {\n\t\t\t\"value\": \"I was charged a $35 overdraft fee because my paycheck was delayed by one day. I have never asked for this before. Can you please waive it?\",\n\t\t\t\"type\":\"String\"\n\t\t},\n\t\t\"priorFeeWaiverCount\": {\n\t\t\t\"value\": 0,\n\t\t\t\"type\":\"Long\"\n\t\t},\n\t\t\"feeAmount\": {\n\t\t\t\"value\": 35.0,\n\t\t\t\"type\":\"Double\"\n\t\t},\n\t\t\"vulnerableCustomer\": {\n\t\t\t\"value\": false,\n\t\t\t\"type\":\"Boolean\"\n\t\t},\n\t\t\"regulatorySensitivity\": {\n\t\t\t\"value\": false,\n\t\t\t\"type\":\"Boolean\"\n\t\t}\n\t},\n\t\"businessKey\":\"test1\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/engine-rest/process-definition/key/process-fee-waiver-request/start",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "engine-rest",
+            "process-definition",
+            "key",
+            "process-fee-waiver-request",
+            "start"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Start Process Fee Waiver Request Escalation",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"variables\": {\n\t\t\"requestText\": {\n\t\t\t\"value\": \"I am filing a complaint because these fees were assessed after I notified the bank about hardship and disputed activity on my account. Reverse every charge immediately.\",\n\t\t\t\"type\":\"String\"\n\t\t},\n\t\t\"priorFeeWaiverCount\": {\n\t\t\t\"value\": 1,\n\t\t\t\"type\":\"Long\"\n\t\t},\n\t\t\"feeAmount\": {\n\t\t\t\"value\": 420.0,\n\t\t\t\"type\":\"Double\"\n\t\t},\n\t\t\"vulnerableCustomer\": {\n\t\t\t\"value\": true,\n\t\t\t\"type\":\"Boolean\"\n\t\t},\n\t\t\"regulatorySensitivity\": {\n\t\t\t\"value\": true,\n\t\t\t\"type\":\"Boolean\"\n\t\t}\n\t},\n\t\"businessKey\":\"test1\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/engine-rest/process-definition/key/process-fee-waiver-request/start",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "engine-rest",
+            "process-definition",
+            "key",
+            "process-fee-waiver-request",
+            "start"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
