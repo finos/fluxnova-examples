@@ -5,11 +5,11 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.finos.fluxnova</groupId>
   <artifactId>fluxnova-springboot-example</artifactId>
-  <version>2.0.0</version>
+  <version>2.1.6</version>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <fluxnova.version>2.0.0</fluxnova.version>
+    <fluxnova.version>2.1.6</fluxnova.version>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
     <dd.version>1.51.0</dd.version>
