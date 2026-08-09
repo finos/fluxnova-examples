@@ -9,7 +9,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <fluxnova.version>2.0.0</fluxnova.version>
+    <fluxnova.version>3.0.0-SNAPSHOT</fluxnova.version>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
     <dd.version>1.51.0</dd.version>
@@ -86,6 +86,13 @@
       <groupId>org.finos.fluxnova.spin</groupId>
       <artifactId>fluxnova-spin-dataformat-all</artifactId>
       <version>${fluxnova.version}</version>
+    </dependency>
+
+    <!-- Plugin for camunda to fluxnova script rewriting, to be used in the preprocessor phase of the engine -->
+    <dependency>
+      <groupId>org.finos.fluxnova.plugins</groupId>
+      <artifactId>fluxnova-backward-compatibility-plugin</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
