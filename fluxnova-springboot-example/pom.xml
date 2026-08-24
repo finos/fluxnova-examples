@@ -83,6 +83,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.finos.fluxnova.plugins</groupId>
+      <artifactId>fluxnova-backward-compatibility-plugin</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.finos.fluxnova.spin</groupId>
       <artifactId>fluxnova-spin-dataformat-all</artifactId>
       <version>${fluxnova.version}</version>
