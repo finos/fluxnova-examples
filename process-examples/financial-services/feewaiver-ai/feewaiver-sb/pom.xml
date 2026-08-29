@@ -8,7 +8,7 @@
   <properties>
     <fluxnova.version>1.0.0</fluxnova.version>
     <camunda.springboot.version>7.24.0</camunda.springboot.version>
-    <graalvm.version>23.0.8</graalvm.version>
+    <graalvm.version>25.3.4.1</graalvm.version>
     <drools.version>8.44.0.Final</drools.version>
     <springboot.version>3.5.7</springboot.version>
     <spring.version>6.2.12</spring.version>
