@@ -12,6 +12,10 @@ fluxnova:
         historyTimeToLive: P1D
     authorization:
       enabled: false
+    plugin:
+      script-preprocessing:
+        enableEnginePlugin: false
+        defaultCamundaToFluxnovaPreprocessorEnabled: false
 fluxnova.bpm.admin-user:
   id: demo
   password: demo

@@ -6,6 +6,7 @@
 - [Building the Spring Boot Application Locally](#building-the-spring-boot-application-locally)
 - [Using the Published Docker Image](#using-the-published-docker-image)
 - [Running the Spring Boot Application Using the Jar from GitHub Packages](#running-the-spring-boot-application-using-the-jar-from-github-packages)
+- [Script Preprocessing Plugin](#script-preprocessing-plugin)
 - [Notes](#notes)
 - [Troubleshooting](#troubleshooting)
 
@@ -129,6 +130,45 @@ java -jar fluxnova-springboot-example-<version>.jar \
   --fluxnova.bpm.admin-user.id=demo \
   --fluxnova.bpm.admin-user.password=demo
 ```
+
+## Script Preprocessing Plugin
+
+Any script preprocessor plugin can be added to the Spring Boot application by including the plugin dependency in the `pom.xml` and configuring it in `application.yaml`.
+This example includes the **Fluxnova Script Preprocessing Plugin**, which automatically rewrites Camunda-based code references (imports, package names, class names) to their Fluxnova equivalents during preprocessing.
+
+### Maven Dependency
+
+The following dependency has been added to `pom.xml`:
+
+```xml
+<!-- Plugin for camunda to fluxnova script rewriting, to be used in the preprocessor phase of the engine -->
+<dependency>
+  <groupId>org.finos.fluxnova.plugins</groupId>
+  <artifactId>fluxnova-backward-compatibility-plugin</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
+This plugin (`fluxnova-backward-compatibility-plugin`) hooks into the Fluxnova engine's script preprocessor SPI and transparently rewrites Camunda script expressions to their Fluxnova equivalents at runtime.
+
+### Configuration
+
+The following settings have been added to `application.yaml` to configure the script preprocessing plugin:
+For complete configuration options, refer to the [Fluxnova Script Preprocessing Plugin documentation](https://github.com/finos/fluxnova-plugins/blob/main/fluxnova-backward-compatibility-plugin/README.md)
+
+```yaml
+fluxnova:
+  bpm:
+    plugin:
+      script-preprocessing:
+        enableEnginePlugin: true
+        defaultCamundaToFluxnovaPreprocessorEnabled: true
+```
+
+| Property                                      | Value  | Description                                                                                                                                       |
+|-----------------------------------------------|--------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| `enableEnginePlugin`                          | `true` | Activates the script preprocessing engine plugin.                                                                                                 |
+| `defaultCamundaToFluxnovaPreprocessorEnabled` | `true` | Enables the built-in default Camunda-to-Fluxnova preprocessor, allowing the `fluxnova-backward-compatibility-plugin` to handle script rewriting.  |
 
 ## Notes
 
