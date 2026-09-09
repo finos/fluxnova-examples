@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:fluxnova="http://fluxnova.org/schema/1.0/bpmn"
+                  xmlns:modeler="http://fluxnova.org/schema/modeler/1.0"
+                  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+                  id="Definitions_Loan"
+                  exporter="Fluxnova Modeler"
+                  modeler:executionPlatform="Fluxnova Platform"
+                  targetNamespace="http://bpmn.io/schema/bpmn">
+
+  <bpmn:process id="loan-approval-process" name="Loan Approval Process" isExecutable="true" camunda:historyTimeToLive="180">
+
+    <!-- ====== START ====== -->
+    <bpmn:startEvent id="Start" name="Loan Application Received">
+      <bpmn:outgoing>Flow_Start_Validate</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- Task 1: Validate Application -->
+    <bpmn:userTask id="Task_Validate" name="Validate Application" camunda:assignee="demo" camunda:candidateGroups="intake">
+      <bpmn:incoming>Flow_Start_Validate</bpmn:incoming>
+      <bpmn:outgoing>Flow_Validate_Gateway1</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- Gateway: Valid? -->
+    <bpmn:exclusiveGateway id="Gateway_Valid" name="Application Valid?">
+      <bpmn:incoming>Flow_Validate_Gateway1</bpmn:incoming>
+      <bpmn:outgoing>Flow_Valid_Parallel</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Invalid_Reject</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- ====== PARALLEL BRANCH: Credit Check + Document Review ====== -->
+    <bpmn:parallelGateway id="Gateway_Parallel_Split" name="Parallel Review">
+      <bpmn:incoming>Flow_Valid_Parallel</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_CreditCheck</bpmn:outgoing>
+      <bpmn:outgoing>Flow_To_DocReview</bpmn:outgoing>
+    </bpmn:parallelGateway>
+
+    <!-- Task 2: Credit Check (automated but slow) -->
+    <bpmn:serviceTask id="Task_CreditCheck" name="Run Credit Check"
+                      camunda:expression="${execution.setVariable('creditScore', 720)}">
+      <bpmn:incoming>Flow_To_CreditCheck</bpmn:incoming>
+      <bpmn:outgoing>Flow_CreditCheck_Done</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- Task 3: Document Review (user task - often a bottleneck) -->
+    <bpmn:userTask id="Task_DocReview" name="Review Documents" camunda:assignee="demo" camunda:candidateGroups="reviewers">
+      <bpmn:incoming>Flow_To_DocReview</bpmn:incoming>
+      <bpmn:outgoing>Flow_DocReview_Done</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- Parallel Join -->
+    <bpmn:parallelGateway id="Gateway_Parallel_Join" name="Reviews Complete">
+      <bpmn:incoming>Flow_CreditCheck_Done</bpmn:incoming>
+      <bpmn:incoming>Flow_DocReview_Done</bpmn:incoming>
+      <bpmn:outgoing>Flow_Join_RiskAssess</bpmn:outgoing>
+    </bpmn:parallelGateway>
+
+    <!-- Task 4: Risk Assessment -->
+    <bpmn:userTask id="Task_RiskAssess" name="Assess Risk Level" camunda:assignee="demo" camunda:candidateGroups="risk-team">
+      <bpmn:incoming>Flow_Join_RiskAssess</bpmn:incoming>
+      <bpmn:outgoing>Flow_Risk_Gateway2</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- Gateway: Risk Level -->
+    <bpmn:exclusiveGateway id="Gateway_Risk" name="Risk Level?">
+      <bpmn:incoming>Flow_Risk_Gateway2</bpmn:incoming>
+      <bpmn:outgoing>Flow_LowRisk_AutoApprove</bpmn:outgoing>
+      <bpmn:outgoing>Flow_HighRisk_SeniorReview</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Task 5: Senior Manager Review (high-risk only - major bottleneck) -->
+    <bpmn:userTask id="Task_SeniorReview" name="Senior Manager Review" camunda:assignee="demo" camunda:candidateGroups="senior-managers">
+      <bpmn:incoming>Flow_HighRisk_SeniorReview</bpmn:incoming>
+      <bpmn:outgoing>Flow_Senior_Decision</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- Gateway: Senior Decision -->
+    <bpmn:exclusiveGateway id="Gateway_SeniorDecision" name="Senior Decision?">
+      <bpmn:incoming>Flow_Senior_Decision</bpmn:incoming>
+      <bpmn:outgoing>Flow_SeniorApprove</bpmn:outgoing>
+      <bpmn:outgoing>Flow_SeniorReject</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Task 6: Generate Offer Letter (auto) -->
+    <bpmn:serviceTask id="Task_GenerateOffer" name="Generate Offer Letter"
+                      camunda:expression="${execution.setVariable('offerGenerated', true)}">
+      <bpmn:incoming>Flow_LowRisk_AutoApprove</bpmn:incoming>
+      <bpmn:incoming>Flow_SeniorApprove</bpmn:incoming>
+      <bpmn:outgoing>Flow_Offer_Notify</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- Task 7: Notify Customer -->
+    <bpmn:userTask id="Task_NotifyCustomer" name="Send Offer to Customer" camunda:assignee="demo" camunda:candidateGroups="customer-service">
+      <bpmn:incoming>Flow_Offer_Notify</bpmn:incoming>
+      <bpmn:outgoing>Flow_Notify_End</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- Task 8: Reject and Notify -->
+    <bpmn:serviceTask id="Task_RejectNotify" name="Send Rejection Notice"
+                      camunda:expression="${execution.setVariable('rejected', true)}">
+      <bpmn:incoming>Flow_Invalid_Reject</bpmn:incoming>
+      <bpmn:incoming>Flow_SeniorReject</bpmn:incoming>
+      <bpmn:outgoing>Flow_Reject_End</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- ====== END EVENTS ====== -->
+    <bpmn:endEvent id="End_Approved" name="Loan Approved">
+      <bpmn:incoming>Flow_Notify_End</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:endEvent id="End_Rejected" name="Loan Rejected">
+      <bpmn:incoming>Flow_Reject_End</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- ====== SEQUENCE FLOWS ====== -->
+    <bpmn:sequenceFlow id="Flow_Start_Validate" sourceRef="Start" targetRef="Task_Validate" />
+    <bpmn:sequenceFlow id="Flow_Validate_Gateway1" sourceRef="Task_Validate" targetRef="Gateway_Valid" />
+
+    <bpmn:sequenceFlow id="Flow_Valid_Parallel" name="Valid" sourceRef="Gateway_Valid" targetRef="Gateway_Parallel_Split">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${valid == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_Invalid_Reject" name="Invalid" sourceRef="Gateway_Valid" targetRef="Task_RejectNotify">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${valid == false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+
+    <bpmn:sequenceFlow id="Flow_To_CreditCheck" sourceRef="Gateway_Parallel_Split" targetRef="Task_CreditCheck" />
+    <bpmn:sequenceFlow id="Flow_To_DocReview" sourceRef="Gateway_Parallel_Split" targetRef="Task_DocReview" />
+
+    <bpmn:sequenceFlow id="Flow_CreditCheck_Done" sourceRef="Task_CreditCheck" targetRef="Gateway_Parallel_Join" />
+    <bpmn:sequenceFlow id="Flow_DocReview_Done" sourceRef="Task_DocReview" targetRef="Gateway_Parallel_Join" />
+
+    <bpmn:sequenceFlow id="Flow_Join_RiskAssess" sourceRef="Gateway_Parallel_Join" targetRef="Task_RiskAssess" />
+    <bpmn:sequenceFlow id="Flow_Risk_Gateway2" sourceRef="Task_RiskAssess" targetRef="Gateway_Risk" />
+
+    <bpmn:sequenceFlow id="Flow_LowRisk_AutoApprove" name="Low Risk" sourceRef="Gateway_Risk" targetRef="Task_GenerateOffer">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${riskLevel == 'low'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_HighRisk_SeniorReview" name="High Risk" sourceRef="Gateway_Risk" targetRef="Task_SeniorReview">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${riskLevel == 'high'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+
+    <bpmn:sequenceFlow id="Flow_Senior_Decision" sourceRef="Task_SeniorReview" targetRef="Gateway_SeniorDecision" />
+    <bpmn:sequenceFlow id="Flow_SeniorApprove" name="Approve" sourceRef="Gateway_SeniorDecision" targetRef="Task_GenerateOffer">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${seniorApproved == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_SeniorReject" name="Reject" sourceRef="Gateway_SeniorDecision" targetRef="Task_RejectNotify">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${seniorApproved == false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+
+    <bpmn:sequenceFlow id="Flow_Offer_Notify" sourceRef="Task_GenerateOffer" targetRef="Task_NotifyCustomer" />
+    <bpmn:sequenceFlow id="Flow_Notify_End" sourceRef="Task_NotifyCustomer" targetRef="End_Approved" />
+    <bpmn:sequenceFlow id="Flow_Reject_End" sourceRef="Task_RejectNotify" targetRef="End_Rejected" />
+
+  </bpmn:process>
+
+  <!-- Diagram Layout for bpmn-js rendering -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_Loan">
+    <bpmndi:BPMNPlane id="BPMNPlane_Loan" bpmnElement="loan-approval-process">
+      <bpmndi:BPMNShape id="Start_di" bpmnElement="Start">
+        <dc:Bounds x="152" y="232" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Validate_di" bpmnElement="Task_Validate">
+        <dc:Bounds x="240" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Valid_di" bpmnElement="Gateway_Valid" isMarkerVisible="true">
+        <dc:Bounds x="395" y="225" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Parallel_Split_di" bpmnElement="Gateway_Parallel_Split">
+        <dc:Bounds x="505" y="225" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CreditCheck_di" bpmnElement="Task_CreditCheck">
+        <dc:Bounds x="620" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_DocReview_di" bpmnElement="Task_DocReview">
+        <dc:Bounds x="620" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Parallel_Join_di" bpmnElement="Gateway_Parallel_Join">
+        <dc:Bounds x="785" y="225" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RiskAssess_di" bpmnElement="Task_RiskAssess">
+        <dc:Bounds x="900" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Risk_di" bpmnElement="Gateway_Risk" isMarkerVisible="true">
+        <dc:Bounds x="1055" y="225" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SeniorReview_di" bpmnElement="Task_SeniorReview">
+        <dc:Bounds x="1160" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_SeniorDecision_di" bpmnElement="Gateway_SeniorDecision" isMarkerVisible="true">
+        <dc:Bounds x="1315" y="305" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_GenerateOffer_di" bpmnElement="Task_GenerateOffer">
+        <dc:Bounds x="1160" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_NotifyCustomer_di" bpmnElement="Task_NotifyCustomer">
+        <dc:Bounds x="1320" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RejectNotify_di" bpmnElement="Task_RejectNotify">
+        <dc:Bounds x="1320" y="400" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Approved_di" bpmnElement="End_Approved">
+        <dc:Bounds x="1482" y="152" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Rejected_di" bpmnElement="End_Rejected">
+        <dc:Bounds x="1482" y="422" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_Start_Validate_di" bpmnElement="Flow_Start_Validate">
+        <di:waypoint x="188" y="250" />
+        <di:waypoint x="240" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Validate_Gateway1_di" bpmnElement="Flow_Validate_Gateway1">
+        <di:waypoint x="340" y="250" />
+        <di:waypoint x="395" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Valid_Parallel_di" bpmnElement="Flow_Valid_Parallel">
+        <di:waypoint x="445" y="250" />
+        <di:waypoint x="505" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Invalid_Reject_di" bpmnElement="Flow_Invalid_Reject">
+        <di:waypoint x="420" y="275" />
+        <di:waypoint x="420" y="440" />
+        <di:waypoint x="1320" y="440" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_CreditCheck_di" bpmnElement="Flow_To_CreditCheck">
+        <di:waypoint x="530" y="225" />
+        <di:waypoint x="530" y="170" />
+        <di:waypoint x="620" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_DocReview_di" bpmnElement="Flow_To_DocReview">
+        <di:waypoint x="530" y="275" />
+        <di:waypoint x="530" y="330" />
+        <di:waypoint x="620" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CreditCheck_Done_di" bpmnElement="Flow_CreditCheck_Done">
+        <di:waypoint x="720" y="170" />
+        <di:waypoint x="810" y="170" />
+        <di:waypoint x="810" y="225" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DocReview_Done_di" bpmnElement="Flow_DocReview_Done">
+        <di:waypoint x="720" y="330" />
+        <di:waypoint x="810" y="330" />
+        <di:waypoint x="810" y="275" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Join_RiskAssess_di" bpmnElement="Flow_Join_RiskAssess">
+        <di:waypoint x="835" y="250" />
+        <di:waypoint x="900" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Risk_Gateway2_di" bpmnElement="Flow_Risk_Gateway2">
+        <di:waypoint x="1000" y="250" />
+        <di:waypoint x="1055" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_LowRisk_AutoApprove_di" bpmnElement="Flow_LowRisk_AutoApprove">
+        <di:waypoint x="1080" y="225" />
+        <di:waypoint x="1080" y="170" />
+        <di:waypoint x="1160" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_HighRisk_SeniorReview_di" bpmnElement="Flow_HighRisk_SeniorReview">
+        <di:waypoint x="1080" y="275" />
+        <di:waypoint x="1080" y="330" />
+        <di:waypoint x="1160" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Senior_Decision_di" bpmnElement="Flow_Senior_Decision">
+        <di:waypoint x="1260" y="330" />
+        <di:waypoint x="1315" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SeniorApprove_di" bpmnElement="Flow_SeniorApprove">
+        <di:waypoint x="1340" y="305" />
+        <di:waypoint x="1340" y="170" />
+        <di:waypoint x="1320" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SeniorReject_di" bpmnElement="Flow_SeniorReject">
+        <di:waypoint x="1340" y="355" />
+        <di:waypoint x="1340" y="400" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Offer_Notify_di" bpmnElement="Flow_Offer_Notify">
+        <di:waypoint x="1260" y="170" />
+        <di:waypoint x="1320" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Notify_End_di" bpmnElement="Flow_Notify_End">
+        <di:waypoint x="1420" y="170" />
+        <di:waypoint x="1482" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Reject_End_di" bpmnElement="Flow_Reject_End">
+        <di:waypoint x="1420" y="440" />
+        <di:waypoint x="1482" y="440" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</bpmn:definitions>

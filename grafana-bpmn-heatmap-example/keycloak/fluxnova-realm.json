@@ -1,0 +1,222 @@
+{
+  "realm": "fluxnova",
+  "enabled": true,
+  "displayName": "Fluxnova BPM",
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "accessTokenLifespan": 3600,
+  "ssoSessionIdleTimeout": 1800,
+  "roles": {
+    "realm": [
+      { "name": "admin", "description": "Full admin access" },
+      { "name": "manager", "description": "Manager-level access" },
+      { "name": "user", "description": "Standard user access" }
+    ]
+  },
+  "groups": [
+    { "name": "intake", "path": "/intake" },
+    { "name": "reviewers", "path": "/reviewers" },
+    { "name": "risk-team", "path": "/risk-team" },
+    { "name": "senior-managers", "path": "/senior-managers" },
+    { "name": "customer-service", "path": "/customer-service" },
+    { "name": "camunda-admin", "path": "/camunda-admin" }
+  ],
+  "users": [
+    {
+      "username": "demo",
+      "email": "demo@fluxnova.local",
+      "firstName": "Demo",
+      "lastName": "User",
+      "enabled": true,
+      "credentials": [{ "type": "password", "value": "demo", "temporary": false }],
+      "realmRoles": ["user"],
+      "groups": ["/intake", "/reviewers"]
+    },
+    {
+      "username": "alice",
+      "email": "alice@fluxnova.local",
+      "firstName": "Alice",
+      "lastName": "Johnson",
+      "enabled": true,
+      "credentials": [{ "type": "password", "value": "alice123", "temporary": false }],
+      "realmRoles": ["user"],
+      "groups": ["/intake", "/reviewers"]
+    },
+    {
+      "username": "bob",
+      "email": "bob@fluxnova.local",
+      "firstName": "Bob",
+      "lastName": "Smith",
+      "enabled": true,
+      "credentials": [{ "type": "password", "value": "bob123", "temporary": false }],
+      "realmRoles": ["user"],
+      "groups": ["/reviewers", "/risk-team"]
+    },
+    {
+      "username": "charlie",
+      "email": "charlie@fluxnova.local",
+      "firstName": "Charlie",
+      "lastName": "Brown",
+      "enabled": true,
+      "credentials": [{ "type": "password", "value": "charlie123", "temporary": false }],
+      "realmRoles": ["manager"],
+      "groups": ["/risk-team", "/senior-managers"]
+    },
+    {
+      "username": "diana",
+      "email": "diana@fluxnova.local",
+      "firstName": "Diana",
+      "lastName": "Prince",
+      "enabled": true,
+      "credentials": [{ "type": "password", "value": "diana123", "temporary": false }],
+      "realmRoles": ["user"],
+      "groups": ["/customer-service"]
+    },
+    {
+      "username": "admin",
+      "email": "admin@fluxnova.local",
+      "firstName": "Admin",
+      "lastName": "User",
+      "enabled": true,
+      "credentials": [{ "type": "password", "value": "admin", "temporary": false }],
+      "realmRoles": ["admin"],
+      "groups": ["/intake", "/reviewers", "/risk-team", "/senior-managers", "/customer-service", "/camunda-admin"]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "camunda-identity-service",
+      "name": "Camunda Identity Service",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "camunda-identity-secret",
+      "redirectUris": ["*"],
+      "webOrigins": ["*"],
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true,
+      "fullScopeAllowed": true
+    },
+    {
+      "clientId": "fluxnova-app",
+      "name": "Fluxnova BPM Platform",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "fluxnova-local-secret",
+      "redirectUris": [
+        "http://localhost:8080/*",
+        "http://localhost:8080/fluxnova/app/*"
+      ],
+      "webOrigins": ["http://localhost:8080"],
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "fullScopeAllowed": true,
+      "protocolMappers": [
+        {
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper",
+          "consentRequired": false,
+          "config": {
+            "full.path": "false",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "groups",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "name": "realm-roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "multivalued": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "roles",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "grafana",
+      "name": "Grafana Dashboard",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "grafana-local-secret",
+      "redirectUris": [
+        "http://localhost:3000/*",
+        "http://localhost:3000/login/generic_oauth"
+      ],
+      "webOrigins": ["http://localhost:3000"],
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "fullScopeAllowed": true,
+      "protocolMappers": [
+        {
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper",
+          "consentRequired": false,
+          "config": {
+            "full.path": "false",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "groups",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "name": "realm-roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "multivalued": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "roles",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "clientScopes": [
+    {
+      "name": "groups",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "true"
+      },
+      "protocolMappers": [
+        {
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper",
+          "consentRequired": false,
+          "config": {
+            "full.path": "false",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "groups",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ]
+}
