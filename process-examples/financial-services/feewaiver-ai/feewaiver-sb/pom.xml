@@ -10,7 +10,7 @@
     <camunda.springboot.version>7.24.0</camunda.springboot.version>
     <graalvm.version>23.0.8</graalvm.version>
     <drools.version>8.44.0.Final</drools.version>
-    <springboot.version>3.5.7</springboot.version>
+    <springboot.version>3.5.16</springboot.version>
     <spring.version>6.2.12</spring.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
