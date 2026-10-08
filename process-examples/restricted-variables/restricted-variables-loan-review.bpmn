@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:fluxnova="http://fluxnova.finos.org/schema/1.0/bpmn" xmlns:modeler="http://fluxnova.org/schema/modeler/1.0" id="Definitions_RestrictedVariables" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Fluxnova Modeler" modeler:executionPlatform="Fluxnova Platform">
+  <bpmn:process id="restricted-variables-loan-review" name="Loan Review (Restricted Variables)" isExecutable="true" camunda:historyTimeToLive="P1D">
+    <bpmn:documentation>Demonstrates restricted process variables. creditScore (process scope) and riskBand (task scope) are marked restricted="true", so only users granted READ_RESTRICTED on the VARIABLE resource can read their values.</bpmn:documentation>
+    <bpmn:startEvent id="application-received" name="Loan application received">
+      <bpmn:outgoing>flow-to-credit-check</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="flow-to-credit-check" sourceRef="application-received" targetRef="run-credit-check" />
+    <!--
+      asyncBefore: the credit check runs in the job executor, where no user is authenticated.
+      Without it, the restricted output mapping would run inside the start request and require
+      CREATE_RESTRICTED for whoever started the process.
+    -->
+    <bpmn:serviceTask id="run-credit-check" name="Run credit check" camunda:asyncBefore="true" camunda:expression="${true}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="creditScore" restricted="true">${loanAmount &gt; 50000 ? 640 : 780}</camunda:outputParameter>
+          <camunda:outputParameter name="creditCheckStatus">COMPLETED</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>flow-to-credit-check</bpmn:incoming>
+      <bpmn:outgoing>flow-to-review</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="flow-to-review" sourceRef="run-credit-check" targetRef="review-application" />
+    <bpmn:userTask id="review-application" name="Review loan application" camunda:candidateGroups="officers">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="riskBand" restricted="true">${creditScore &gt;= 700 ? 'LOW' : 'HIGH'}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>flow-to-review</bpmn:incoming>
+      <bpmn:outgoing>flow-to-end</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="flow-to-end" sourceRef="review-application" targetRef="application-reviewed" />
+    <bpmn:endEvent id="application-reviewed" name="Loan application reviewed">
+      <bpmn:incoming>flow-to-end</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_RestrictedVariables">
+    <bpmndi:BPMNPlane id="BPMNPlane_RestrictedVariables" bpmnElement="restricted-variables-loan-review">
+      <bpmndi:BPMNShape id="application-received_di" bpmnElement="application-received">
+        <dc:Bounds x="152" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="130" y="145" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="run-credit-check_di" bpmnElement="run-credit-check">
+        <dc:Bounds x="240" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="review-application_di" bpmnElement="review-application">
+        <dc:Bounds x="400" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="application-reviewed_di" bpmnElement="application-reviewed">
+        <dc:Bounds x="562" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="540" y="145" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="flow-to-credit-check_di" bpmnElement="flow-to-credit-check">
+        <di:waypoint x="188" y="120" />
+        <di:waypoint x="240" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow-to-review_di" bpmnElement="flow-to-review">
+        <di:waypoint x="340" y="120" />
+        <di:waypoint x="400" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow-to-end_di" bpmnElement="flow-to-end">
+        <di:waypoint x="500" y="120" />
+        <di:waypoint x="562" y="120" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
