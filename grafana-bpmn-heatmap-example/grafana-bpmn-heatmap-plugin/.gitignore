@@ -1,0 +1,10 @@
+# Ignore node_modules but NOT dist/ — dist is committed for portability
+node_modules/
+
+# Build artifacts that aren't dist
+*.tsbuildinfo
+
+# Lock file is not committed — dist/ is the runnable artifact, and the lock
+# would otherwise pin registry-specific "resolved" URLs. Contributors who
+# rebuild generate their own against their registry.
+package-lock.json

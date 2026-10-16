@@ -1,0 +1,61 @@
+groups:
+  - name: fluxnova_bottleneck_alerts
+    rules:
+      # Alert: More than 50% of tokens are stuck at one activity for over 24 hours
+      - alert: TokenBottleneck_50pct_24h
+        expr: |
+          (fluxnova_activity_token_ratio > 0.5)
+          and
+          (fluxnova_activity_oldest_token_age_seconds > 86400)
+        for: 5m
+        labels:
+          severity: critical
+          team: process-ops
+        annotations:
+          summary: "Bottleneck detected: {{ $labels.activity_name }} has {{ $value | humanizePercentage }} of all tokens"
+          description: |
+            Activity "{{ $labels.activity_name }}" ({{ $labels.activity_id }}) in process "{{ $labels.process }}" 
+            is holding more than 50% of active tokens and the oldest token has been stuck for over 24 hours.
+            Current ratio: {{ $value | humanizePercentage }}
+            Action: Check if the task is blocked, under-resourced, or needs escalation.
+
+      # Warning: 30% of tokens at one task for over 4 hours (early warning)
+      - alert: TokenBottleneck_30pct_4h
+        expr: |
+          (fluxnova_activity_token_ratio > 0.3)
+          and
+          (fluxnova_activity_oldest_token_age_seconds > 14400)
+        for: 5m
+        labels:
+          severity: warning
+          team: process-ops
+        annotations:
+          summary: "Potential bottleneck: {{ $labels.activity_name }} holding {{ $value | humanizePercentage }} of tokens"
+          description: |
+            Activity "{{ $labels.activity_name }}" is accumulating tokens (>30%) and the oldest has been waiting over 4 hours.
+            This may become a critical bottleneck if not addressed.
+
+      # Alert: Any single token stuck at a user task for over 48 hours
+      - alert: TokenStuck_48h
+        expr: |
+          fluxnova_activity_oldest_token_age_seconds{activity_type="userTask"} > 172800
+        for: 10m
+        labels:
+          severity: warning
+          team: process-ops
+        annotations:
+          summary: "Stuck token: {{ $labels.activity_name }} has a token waiting over 48 hours"
+          description: |
+            The oldest token at "{{ $labels.activity_name }}" has been waiting for 
+            {{ $value | humanizeDuration }}. This may indicate an abandoned or forgotten task.
+
+      # Info: Engine down
+      - alert: FluxnovaDown
+        expr: fluxnova_up == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Fluxnova BPM engine is unreachable"
+          description: "The Fluxnova exporter cannot reach the engine REST API. Check container health."
