@@ -1,0 +1,46 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:abac-poc;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driverClassName: org.h2.Driver
+    username: sa
+    password: ""
+  h2:
+    console:
+      enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    db:
+      enabled: true
+
+fluxnova:
+  bpm:
+    admin-user:
+      id: demo
+      password: demo
+
+opa:
+  # This POC intentionally uses a local mock client instead of calling OPA.
+  # To enable real OPA later, implement the placeholder in OpaPolicyClient with an HTTP client,
+  # set mock-enabled=false, and configure the base-url/path below.
+  mock-enabled: true
+  base-url: http://localhost:8181
+  valid-candidate-group-path: /v1/data/iac/attribute_validation/valid_candidate_group
+  tenant-id: tenant-abac-poc
+
+logging:
+  level:
+    ACCESS_LOGGER: INFO
+    org.finos.fluxnova.authorization: INFO
+

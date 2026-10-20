@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+                  id="Definitions_abac_poc"
+                  targetNamespace="http://finos.org/fluxnova/examples/financial-services/abac-poc">
+  <bpmn:process id="process-abac-poc" name="ABAC POC Process" isExecutable="true" camunda:historyTimeToLive="180">
+    <bpmn:extensionElements>
+      <camunda:properties>
+        <camunda:property name="attr-region" value="US" />
+        <camunda:property name="attr-business" value="WEALTH" />
+      </camunda:properties>
+    </bpmn:extensionElements>
+
+    <bpmn:startEvent id="StartEvent_1" name="Start">
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="WealthReviewTask" />
+
+    <bpmn:userTask id="WealthReviewTask" name="Wealth Business Review" camunda:candidateGroups="attr-4536f34c:val-10149960">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="attr-region" value="US" />
+          <camunda:property name="attr-business" value="WEALTH" />
+          <camunda:property name="attr-department" value="TRADING" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="WealthReviewTask" targetRef="OperationsReviewTask" />
+
+    <bpmn:userTask id="OperationsReviewTask" name="Operations Review" camunda:candidateGroups="attr-4536f34c:val-20284710">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="attr-region" value="EU" />
+          <camunda:property name="attr-business" value="OPERATIONS" />
+          <camunda:property name="attr-department" value="SETTLEMENT" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="OperationsReviewTask" targetRef="ApacApprovalTask" />
+
+    <bpmn:userTask id="ApacApprovalTask" name="APAC Approval" camunda:candidateGroups="attr-4536f34c:val-99999999">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="attr-region" value="APAC" />
+          <camunda:property name="attr-business" value="WEALTH" />
+          <camunda:property name="attr-department" value="OPERATIONS" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="ApacApprovalTask" targetRef="EndEvent_1" />
+
+    <bpmn:endEvent id="EndEvent_1" name="End">
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="process-abac-poc">
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="100" y="100" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="WealthReviewTask_di" bpmnElement="WealthReviewTask">
+        <dc:Bounds x="200" y="80" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="OperationsReviewTask_di" bpmnElement="OperationsReviewTask">
+        <dc:Bounds x="400" y="80" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ApacApprovalTask_di" bpmnElement="ApacApprovalTask">
+        <dc:Bounds x="600" y="80" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1_di" bpmnElement="EndEvent_1">
+        <dc:Bounds x="800" y="100" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+        <di:waypoint x="136" y="118" />
+        <di:waypoint x="200" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+        <di:waypoint x="320" y="120" />
+        <di:waypoint x="400" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+        <di:waypoint x="520" y="120" />
+        <di:waypoint x="600" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_4_di" bpmnElement="Flow_4">
+        <di:waypoint x="720" y="120" />
+        <di:waypoint x="800" y="118" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
+
