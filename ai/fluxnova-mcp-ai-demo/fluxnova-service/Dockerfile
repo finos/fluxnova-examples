@@ -2,14 +2,6 @@
 FROM maven:3.9-eclipse-temurin-21 AS builder
 WORKDIR /workspace
 
-COPY dependency/mcp-fluxnova-extension-0.1.0.jar /tmp/mcp-fluxnova-extension-0.1.0.jar
-RUN mvn install:install-file \
-    -Dfile=/tmp/mcp-fluxnova-extension-0.1.0.jar \
-    -DgroupId=org.finos.fluxnova.ai.mcp \
-    -DartifactId=mcp-fluxnova-extension \
-    -Dversion=0.1.0 \
-    -Dpackaging=jar
-
 COPY fluxnova-service/pom.xml ./fluxnova-service/pom.xml
 RUN mvn -f fluxnova-service/pom.xml dependency:go-offline
 
