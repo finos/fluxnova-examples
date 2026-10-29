@@ -2,7 +2,8 @@ spring.datasource.url: jdbc:h2:file:./fluxnova-h2-database
 spring.datasource.driverClassName: org.h2.Driver
 spring.datasource.username: sa
 spring.datasource.password: sa
-
+# Uses the Fluxnova provided changelog file to create the database schema and tables.
+spring.liquibase.enabled: true
 fluxnova:
   bpm:
     test-user-setup:
