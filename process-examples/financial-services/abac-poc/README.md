@@ -20,6 +20,8 @@ cover claim, assign, delegate, delete, variable updates, process start, or other
 
 ### Read
 
+![ABAC read authorization](docs/images/abac-read-authorization.png)
+
 1. The `/abac/*` demo authentication filter accepts one of the demo HTTP Basic credentials below
    and sets the current FluxNova identity for the request.
 2. The controller obtains the authenticated user ID. The caller cannot choose a different ID in
@@ -31,6 +33,8 @@ cover claim, assign, delegate, delete, variable updates, process start, or other
    omitted. Resources without ABAC attributes are treated as public by this read filter.
 
 ### Write
+
+![ABAC write authorization](docs/images/abac-write-authorization.png)
 
 1. The engine REST authentication filter authenticates the demo user and sets the current identity.
 2. Completing a task invokes `OpaCompleteTaskAuthorizationInterceptor` in the engine command
