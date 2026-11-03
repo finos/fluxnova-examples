@@ -14,9 +14,15 @@ on:
   repository_dispatch:
     types: [update-version]
 
+permissions:
+  contents: read
+
 jobs:
   update-version:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
 
     steps:
       - name: Determine version input
