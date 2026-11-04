@@ -1,0 +1,54 @@
+# Reference OPA policy from the forked POC.
+#
+# This module currently uses OpaPolicyClient as an in-memory mock and does not call OPA.
+# Keep this file as the target policy contract for the future real OPA implementation.
+
+# 1) Load attribute data into OPA
+curl -s -X PUT http://localhost:8181/v1/data/iac/attributes \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tenant-abac-poc": [
+      {
+        "id": "attr-4536f34c",
+        "displayName": "Processing Team",
+        "values": [
+          { "id": "val-10149960", "displayName": "Tier 1 Reviewers", "enabled": true },
+          { "id": "val-20284710", "displayName": "Tier 2 Approvers", "enabled": true },
+          { "id": "val-99999999", "displayName": "Old Team", "enabled": false }
+        ]
+      }
+    ]
+  }'
+
+# 2) Load policy into OPA
+curl -s -X PUT http://localhost:8181/v1/policies/iac/attribute_validation \
+  -H "Content-Type: text/plain" \
+  --data-binary '
+package iac.attribute_validation
+
+import rego.v1
+
+default valid_candidate_group := false
+
+valid_candidate_group if {
+  parts := split(input.candidate_group, ":")
+  count(parts) == 2
+
+  attr_id := parts[0]
+  val_id := parts[1]
+
+  attribute := data.iac.attributes[input.tenant_id][_]
+  attribute.id == attr_id
+
+  value := attribute.values[_]
+  value.id == val_id
+  value.enabled == true
+}
+'
+
+# 3) Evaluate an enabled candidate group
+curl -s -X POST http://localhost:8181/v1/data/iac/attribute_validation/valid_candidate_group \
+  -H "Content-Type: application/json" \
+  -d '{"input":{"tenant_id":"tenant-abac-poc","candidate_group":"attr-4536f34c:val-10149960"}}' \
+  | python3 -m json.tool
+
