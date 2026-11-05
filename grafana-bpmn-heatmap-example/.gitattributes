@@ -1,0 +1,3 @@
+# Mark compiled/generated files so they don't appear in diffs
+grafana-bpmn-heatmap-plugin/dist/module.js linguist-generated
+grafana-bpmn-heatmap-plugin/dist/module.js.map linguist-generated

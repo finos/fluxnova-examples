@@ -1,0 +1,98 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 18,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "bpmnUrl": "/public/plugins/fluxnova-bpmn-heatmap-panel/bpmn/loan-approval.bpmn",
+        "bpmnXml": "",
+        "metricField": "activity_id",
+        "valueField": "Value",
+        "showLabels": true,
+        "thresholds": [
+          {
+            "min": 20,
+            "max": 999999,
+            "color": "#ad1457",
+            "overlayColor": "rgba(173, 20, 87, 0.30)",
+            "label": "critical",
+            "description": "20+ tokens (critical)"
+          },
+          {
+            "min": 10,
+            "max": 19,
+            "color": "#c62828",
+            "overlayColor": "rgba(198, 40, 40, 0.25)",
+            "label": "high",
+            "description": "10–19 tokens (bottleneck)"
+          },
+          {
+            "min": 3,
+            "max": 9,
+            "color": "#e65100",
+            "overlayColor": "rgba(230, 81, 0, 0.20)",
+            "label": "medium",
+            "description": "3–9 tokens (building up)"
+          },
+          {
+            "min": 1,
+            "max": 2,
+            "color": "#2e7d32",
+            "overlayColor": "rgba(46, 125, 50, 0.15)",
+            "label": "low",
+            "description": "1–2 tokens (flowing)"
+          }
+        ]
+      },
+      "title": "Loan Approval Process - Token Heatmap",
+      "type": "fluxnova-bpmn-heatmap-panel",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "fluxnova_activity_tokens{process=\"loan-approval-process\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 38,
+  "tags": ["bpmn", "heatmap", "fluxnova"],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-5m",
+    "to": "now"
+  },
+  "title": "Fluxnova - BPMN Process Heatmap",
+  "uid": "fluxnova-bpmn-heatmap",
+  "version": 1
+}

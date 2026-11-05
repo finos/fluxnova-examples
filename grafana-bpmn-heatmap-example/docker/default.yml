@@ -1,0 +1,18 @@
+# Fluxnova BPM engine configuration
+# Properties use the fluxnova.bpm namespace as Fluxnova inherited from Camunda BPM platform.
+# The camunda.bpm namespace is still supported for backward compatibility.
+
+fluxnova.bpm:
+  run:
+    auth:
+      enabled: true
+  authorization:
+    enabled: true
+  admin-user:
+    id: admin
+    password: admin
+    firstName: Admin
+    lastName: User
+
+server:
+  port: 8080

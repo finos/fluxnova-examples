@@ -1,0 +1,23 @@
+{
+  "type": "panel",
+  "id": "fluxnova-bpmn-heatmap-panel",
+  "name": "BPMN Process Heatmap",
+  "info": {
+    "description": "Renders BPMN diagrams with metric-driven heatmap overlays. Visualises where tokens are accumulating to identify process bottlenecks.",
+    "author": {
+      "name": "Fluxnova",
+      "url": "https://github.com/desolate-planet/fluxnova-grafana-demo"
+    },
+    "keywords": ["bpmn", "heatmap", "process", "workflow", "bottleneck"],
+    "logos": {
+      "small": "img/logo.svg",
+      "large": "img/logo.svg"
+    },
+    "version": "1.0.0",
+    "updated": "2026-08-17"
+  },
+  "dependencies": {
+    "grafanaVersion": "10.0.x",
+    "grafanaDependency": ">=10.0.0"
+  }
+}

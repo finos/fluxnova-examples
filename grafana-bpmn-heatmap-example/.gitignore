@@ -1,0 +1,25 @@
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Podman/Docker state (not needed in repo)
+*.tar
+
+# Generated Grafana provisioning files (recreated by start-monitoring script)
+monitoring/grafana-datasource.yml
+monitoring/grafana-dashboard-provider.yml
+
+# Fluxnova modeler (local tool, not part of the project)
+fluxnova-modeler/
