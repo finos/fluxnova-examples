@@ -38,9 +38,9 @@ sequenceDiagram
     MC-->>U: Response
 ```
 
-## Local Dependency
+## MCP Start Event Dependency
 
-The `mcp-fluxnova-extension-0.1.0.jar` dependency has not yet been released to a public Maven repository. It is included in the `dependency/` folder and is automatically installed into the Maven local repository during the Docker build.
+The Fluxnova MCP Start Event plugin is resolved from Maven Central using `org.finos.fluxnova.bpm:fluxnova-engine-plugins-ai-mcp-start-event:2.0.0`.
 
 ## Prerequisites
 
