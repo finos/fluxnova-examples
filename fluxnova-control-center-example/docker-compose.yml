@@ -1,0 +1,131 @@
+# Fluxnova stack: Keycloak (OIDC) + Fluxnova Control Center + Fluxnova BPM engine.
+#
+#   docker compose up -d
+#
+# Then open https://localhost:4000 and sign in as demo / demo.
+# See README.md for the full walkthrough, users and known limitations.
+#
+# Hostnames: containers call Keycloak on keycloak:8443 (token, userinfo), while the
+# browser is redirected to localhost:8443. Keycloak is pinned to https://localhost:8443
+# as its frontend URL, so the issuer in every token stays https://localhost:8443/...
+# no matter which hostname was used to fetch it.
+name: fluxnova-control-center-example
+
+services:
+  # One-shot job: creates a self-signed certificate shared by Keycloak and the
+  # Control Center. The OIDC client in the Control Center only accepts an https
+  # authority, so TLS is required even locally. Existing certs are kept.
+  certs:
+    image: alpine:${ALPINE_VERSION:-3.22}
+    command:
+      - /bin/sh
+      - -c
+      - |
+        set -e
+        if [ -s /certs/fluxnova-local.crt ] && [ -s /certs/fluxnova-local.key ]; then
+          echo "Certificate already present, skipping."
+          exit 0
+        fi
+        apk add --no-cache openssl > /dev/null
+        openssl req -x509 -newkey rsa:2048 -nodes -days 365 \
+          -keyout /certs/fluxnova-local.key \
+          -out /certs/fluxnova-local.crt \
+          -subj "/O=FINOS/CN=localhost" \
+          -addext "subjectAltName=DNS:localhost,DNS:keycloak,DNS:control-center,IP:127.0.0.1"
+        # Keycloak (uid 1000) and the Control Center (uid 1001) both read the key.
+        # Fine for a throwaway local volume, never do this with a real key.
+        chmod 644 /certs/fluxnova-local.key /certs/fluxnova-local.crt
+        echo "Certificate generated."
+    volumes:
+      - certs:/certs
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION:-26.7}
+    command: start-dev --import-realm
+    depends_on:
+      certs:
+        condition: service_completed_successfully
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KC_HOSTNAME: https://localhost:8443
+      KC_HTTP_ENABLED: "false"
+      KC_HTTPS_CERTIFICATE_FILE: /certs/fluxnova-local.crt
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /certs/fluxnova-local.key
+    ports:
+      - "8443:8443"
+    volumes:
+      - ./keycloak/fluxnova-realm.json:/opt/keycloak/data/import/fluxnova-realm.json:ro
+      - certs:/certs:ro
+    healthcheck:
+      # The image has no curl; checking the HTTPS port is open is enough, since the
+      # realm import finishes before Keycloak starts listening.
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8443"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  engine:
+    image: finos/fluxnova-bpm-platform:${FLUXNOVA_ENGINE_VERSION:-3.0.0}
+    environment:
+      # REST API authentication is off: see "Known limitations" in README.md.
+      FLUXNOVA_BPM_RUN_AUTH_ENABLED: "false"
+    ports:
+      # Bound to localhost only, because the REST API is unauthenticated.
+      # Gives access to the bundled webapps (demo / demo) and the REST API.
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/engine-rest/engine > /dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 40s
+
+  control-center:
+    image: finos/fluxnova-control-center:${FLUXNOVA_CONTROL_CENTER_VERSION:-1.2.0}
+    depends_on:
+      certs:
+        condition: service_completed_successfully
+      keycloak:
+        condition: service_healthy
+      engine:
+        condition: service_healthy
+    environment:
+      FXN_LOG_LEVEL: ${FXN_LOG_LEVEL:-info}
+      FXN_REST_API_URL: http://engine:8080/engine-rest
+      FXN_PUBLIC_URL: https://localhost:4000
+      FXN_COOKIE_KEYS: ${FXN_COOKIE_KEYS:-change-me-cookie-key}
+      FXN_CSRF_KEY: ${FXN_CSRF_KEY:-change-me-csrf-key}
+
+      # UI login through Keycloak.
+      FXN_AUTH_STRATEGY: oidc
+      FXN_OIDC_CLIENT_ID: fluxnova-control-center
+      FXN_OIDC_CLIENT_SECRET: ${FXN_OIDC_CLIENT_SECRET:-control-center-secret}
+      FXN_OIDC_AUTHORITY: https://keycloak:8443/realms/fluxnova
+      # Must match the iss claim, which Keycloak derives from KC_HOSTNAME.
+      FXN_OIDC_ISSUER: https://localhost:8443/realms/fluxnova
+      # Browser redirect, so it has to be reachable from the host.
+      FXN_OIDC_AUTH_URL: https://localhost:8443/realms/fluxnova/protocol/openid-connect/auth
+      # Server-to-server calls, over the compose network.
+      FXN_OIDC_TOKEN_URL: https://keycloak:8443/realms/fluxnova/protocol/openid-connect/token
+      FXN_OIDC_USERINFO_URL: https://keycloak:8443/realms/fluxnova/protocol/openid-connect/userinfo
+
+      # Serve the UI over HTTPS with the generated certificate, and trust that same
+      # certificate when calling Keycloak.
+      FXN_SSL_CERT_PATH: /certs/fluxnova-local.crt
+      FXN_SSL_KEY_PATH: /certs/fluxnova-local.key
+      NODE_EXTRA_CA_CERTS: /certs/fluxnova-local.crt
+
+      # Clear any proxies inherited from the host: they break container-to-container calls.
+      http_proxy:
+      HTTP_PROXY:
+      https_proxy:
+      HTTPS_PROXY:
+    ports:
+      - "4000:4000"
+    volumes:
+      - certs:/certs:ro
+
+volumes:
+  certs:
