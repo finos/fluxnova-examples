@@ -18,7 +18,7 @@
     <maven.compiler.target>21</maven.compiler.target>
     <java.version>21</java.version>
     <fluxnova.version>3.0.0</fluxnova.version>
-    <springboot.version>4.0.5</springboot.version>
+    <springboot.version>4.1.2</springboot.version>
   </properties>
 
   <dependencyManagement>
