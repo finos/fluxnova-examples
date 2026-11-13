@@ -48,7 +48,7 @@
   </dependencyManagement>
 
   <dependencies>
-    <!-- Fluxnova engine + REST API + Cockpit/Tasklist/Admin webapps -->
+    <!-- Fluxnova engine + REST API + Monitoring/Tasklist/Admin webapps -->
     <dependency>
       <groupId>org.finos.fluxnova.bpm.springboot</groupId>
       <artifactId>fluxnova-bpm-spring-boot-starter-webapp</artifactId>

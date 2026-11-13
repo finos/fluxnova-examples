@@ -4,7 +4,7 @@ A Fluxnova Spring Boot application that exposes the process engine's query API a
 [MCP](https://modelcontextprotocol.io/) tools using the
 [`mcp-query-workflow`](https://github.com/finos/fluxnova-plugins/tree/main/agentic/mcp-query-workflow) plugin. An LLM
 connected to the MCP server can answer questions such as *"Which orders have open incidents?"* or *"What is Alice
-working on?"* without using Cockpit.
+working on?"* without opening the Monitoring webapp or Control Center.
 
 On start-up the application deploys an order fulfilment process and a discount decision table, then seeds three
 orders:
@@ -36,7 +36,7 @@ mvn spring-boot:run
 ```
 
 - MCP endpoint (streamable HTTP): `http://localhost:8080/mcp`
-- Fluxnova webapps: `http://localhost:8080` (user `demo` / `demo`)
+- Fluxnova webapps (Monitoring, Tasklist, Admin): `http://localhost:8080/fluxnova/app/` (user `demo` / `demo`)
 
 Set `example.seed-data=false` to start without the demo data.
 
