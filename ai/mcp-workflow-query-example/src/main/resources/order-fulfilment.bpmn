@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  xmlns:fluxnova="http://fluxnova.finos.org/schema/1.0/bpmn"
+                  id="Definitions_orderFulfilment"
+                  targetNamespace="http://fluxnova.finos.org/examples/mcp-query">
+  <bpmn:process id="orderFulfilment" name="Order Fulfilment" isExecutable="true" fluxnova:historyTimeToLive="P30D">
+    <bpmn:startEvent id="OrderReceived" name="Order received">
+      <bpmn:outgoing>Flow_toSplit</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:parallelGateway id="Split">
+      <bpmn:incoming>Flow_toSplit</bpmn:incoming>
+      <bpmn:outgoing>Flow_toReview</bpmn:outgoing>
+      <bpmn:outgoing>Flow_toCredit</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:userTask id="ReviewOrder" name="Review order" fluxnova:assignee="${reviewer}" fluxnova:candidateGroups="sales">
+      <bpmn:incoming>Flow_toReview</bpmn:incoming>
+      <bpmn:outgoing>Flow_reviewToJoin</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="CreditCheck" name="Credit check" fluxnova:type="external" fluxnova:topic="credit-check">
+      <bpmn:incoming>Flow_toCredit</bpmn:incoming>
+      <bpmn:outgoing>Flow_creditToJoin</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:parallelGateway id="Join">
+      <bpmn:incoming>Flow_reviewToJoin</bpmn:incoming>
+      <bpmn:incoming>Flow_creditToJoin</bpmn:incoming>
+      <bpmn:outgoing>Flow_toEnd</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:endEvent id="OrderFulfilled" name="Order fulfilled">
+      <bpmn:incoming>Flow_toEnd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_toSplit" sourceRef="OrderReceived" targetRef="Split" />
+    <bpmn:sequenceFlow id="Flow_toReview" sourceRef="Split" targetRef="ReviewOrder" />
+    <bpmn:sequenceFlow id="Flow_toCredit" sourceRef="Split" targetRef="CreditCheck" />
+    <bpmn:sequenceFlow id="Flow_reviewToJoin" sourceRef="ReviewOrder" targetRef="Join" />
+    <bpmn:sequenceFlow id="Flow_creditToJoin" sourceRef="CreditCheck" targetRef="Join" />
+    <bpmn:sequenceFlow id="Flow_toEnd" sourceRef="Join" targetRef="OrderFulfilled" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="orderFulfilment">
+      <bpmndi:BPMNShape id="OrderReceived_di" bpmnElement="OrderReceived">
+        <dc:Bounds x="152" y="182" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Split_di" bpmnElement="Split">
+        <dc:Bounds x="245" y="175" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ReviewOrder_di" bpmnElement="ReviewOrder">
+        <dc:Bounds x="350" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CreditCheck_di" bpmnElement="CreditCheck">
+        <dc:Bounds x="350" y="240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Join_di" bpmnElement="Join">
+        <dc:Bounds x="505" y="175" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="OrderFulfilled_di" bpmnElement="OrderFulfilled">
+        <dc:Bounds x="612" y="182" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_toSplit_di" bpmnElement="Flow_toSplit">
+        <di:waypoint x="188" y="200" />
+        <di:waypoint x="245" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_toReview_di" bpmnElement="Flow_toReview">
+        <di:waypoint x="270" y="175" />
+        <di:waypoint x="270" y="120" />
+        <di:waypoint x="350" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_toCredit_di" bpmnElement="Flow_toCredit">
+        <di:waypoint x="270" y="225" />
+        <di:waypoint x="270" y="280" />
+        <di:waypoint x="350" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_reviewToJoin_di" bpmnElement="Flow_reviewToJoin">
+        <di:waypoint x="450" y="120" />
+        <di:waypoint x="530" y="120" />
+        <di:waypoint x="530" y="175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_creditToJoin_di" bpmnElement="Flow_creditToJoin">
+        <di:waypoint x="450" y="280" />
+        <di:waypoint x="530" y="280" />
+        <di:waypoint x="530" y="225" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_toEnd_di" bpmnElement="Flow_toEnd">
+        <di:waypoint x="555" y="200" />
+        <di:waypoint x="612" y="200" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

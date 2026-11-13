@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: mcp-workflow-query-example
+  datasource:
+    url: jdbc:h2:mem:fluxnova;DB_CLOSE_DELAY=-1
+  ai:
+    mcp:
+      server:
+        name: fluxnova-mcp-server
+        version: 1.0.0
+        protocol: STREAMABLE
+        type: SYNC
+
+fluxnova:
+  bpm:
+    admin-user:
+      id: demo
+      password: demo
+      first-name: Demo
+    filter:
+      create: All tasks
+    history-level: full
+    generic-properties:
+      properties:
+        # required by the engine for history cleanup; applies to models without their own TTL
+        historyTimeToLive: P30D
+  mcp:
+    query:
+      # Absolute ceiling on results returned by any query tool call
+      max-results: 50
+      tools:
+        # Example: hide a tool the LLM does not need
+        exclude: querySchemaLog
