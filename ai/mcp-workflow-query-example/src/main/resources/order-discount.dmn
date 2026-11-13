@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+             id="Definitions_orderDiscount" name="Order discount"
+             namespace="http://fluxnova.finos.org/examples/mcp-query">
+  <decision id="orderDiscount" name="Order discount">
+    <decisionTable id="DecisionTable_orderDiscount" hitPolicy="FIRST">
+      <input id="Input_tier" label="Customer tier">
+        <inputExpression id="InputExpression_tier" typeRef="string">
+          <text>customerTier</text>
+        </inputExpression>
+      </input>
+      <output id="Output_discount" label="Discount %" name="discount" typeRef="integer" />
+      <rule id="Rule_gold">
+        <inputEntry id="Entry_gold"><text>"Gold"</text></inputEntry>
+        <outputEntry id="Out_gold"><text>10</text></outputEntry>
+      </rule>
+      <rule id="Rule_silver">
+        <inputEntry id="Entry_silver"><text>"Silver"</text></inputEntry>
+        <outputEntry id="Out_silver"><text>5</text></outputEntry>
+      </rule>
+      <rule id="Rule_other">
+        <inputEntry id="Entry_other"><text>-</text></inputEntry>
+        <outputEntry id="Out_other"><text>0</text></outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>
