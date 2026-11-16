@@ -1,0 +1,42 @@
+# Fluxnova engine with authorization enabled, plus a one-shot job that runs setup.sh
+# (users, groups, authorizations, deployment) once the engine is up.
+#
+#   docker compose up -d
+#
+# Then follow "Run the example" in README.md, starting at step 1.
+name: fluxnova-restricted-variables
+
+services:
+  engine:
+    image: finos/fluxnova-bpm-platform:3.0.0
+    environment:
+      # Restricted variables are only enforced with authorization enabled...
+      FLUXNOVA_BPM_AUTHORIZATION_ENABLED: "true"
+      # ...and for authenticated callers: HTTP Basic authentication on the REST API.
+      FLUXNOVA_BPM_RUN_AUTH_ENABLED: "true"
+      # The bundled invoice example fails on startup when authorization is enabled (3.0.0).
+      FLUXNOVA_BPM_RUN_EXAMPLE_ENABLED: "false"
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS -u demo:demo http://localhost:8080/engine-rest/engine > /dev/null || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 40
+      start_period: 30s
+
+  setup:
+    # Same image as the engine: it already has bash and curl.
+    image: finos/fluxnova-bpm-platform:3.0.0
+    depends_on:
+      engine:
+        condition: service_healthy
+    entrypoint: ["bash", "/example/setup.sh"]
+    environment:
+      ENGINE_URL: http://engine:8080/engine-rest
+      ADMIN_USER: demo
+      ADMIN_PASSWORD: demo
+    volumes:
+      - ./setup.sh:/example/setup.sh:ro
+      - ./restricted-variables-loan-review.bpmn:/example/restricted-variables-loan-review.bpmn:ro
+    restart: "no"
