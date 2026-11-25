@@ -45,9 +45,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.finos.fluxnova.ai.mcp</groupId>
-            <artifactId>mcp-fluxnova-extension</artifactId>
-            <version>0.1.0</version>
+            <groupId>org.finos.fluxnova.bpm</groupId>
+            <artifactId>fluxnova-engine-plugins-ai-mcp-start-event</artifactId>
+            <version>2.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

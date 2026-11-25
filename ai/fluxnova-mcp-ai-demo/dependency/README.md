@@ -1,1 +1,0 @@
-This artefact is not yet live in maven central, so including here for now.
